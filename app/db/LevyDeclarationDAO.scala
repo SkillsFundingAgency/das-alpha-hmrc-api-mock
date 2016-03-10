@@ -18,6 +18,8 @@ class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   def all(): Future[Seq[LevyDeclarationRow]] = db.run(LevyDeclarations.result)
 
+  def byEmpref(empref: String): Future[Seq[LevyDeclarationRow]] = db.run(LevyDeclarations.filter(_.empref === empref).result)
+
   def insert(cat: LevyDeclarationRow): Future[Unit] = db.run(LevyDeclarations += cat).map { _ => () }
 
   class LevyDeclarationTable(tag: Tag) extends Table[LevyDeclarationRow](tag, "LEVY_DECLARATION") {

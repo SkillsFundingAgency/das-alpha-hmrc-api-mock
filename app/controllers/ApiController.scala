@@ -2,22 +2,26 @@ package controllers
 
 import javax.inject._
 
-import db.SchemeDAO
+import db.{LevyDeclarationDAO, SchemeDAO}
 import models.{LevyDeclaration, LevyDeclarations, PayrollMonth}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.domain.EmpRef
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class ApiController @Inject()(schemeDAO: SchemeDAO)(implicit exec: ExecutionContext) extends Controller {
+class ApiController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDeclarationDAO)(implicit exec: ExecutionContext) extends Controller {
   def getLevyDeclarations(empref: EmpRef) = Action.async {
-    val declarations = Seq(LevyDeclaration(PayrollMonth(2016, 1), BigDecimal(3200)))
-    val levyData = new LevyDeclarations(empref, declarations)
 
-    Future.successful(Ok(Json.toJson(levyData)))
+    levyDeclarationDAO.byEmpref(empref.value).map { ds =>
+      val decls = ds.map { d =>
+        LevyDeclaration(PayrollMonth(d.year, d.month), d.amount)
+      }
+
+      Ok(Json.toJson(LevyDeclarations(empref, decls)))
+    }
   }
 
   def getSchemesForUtr(utr: String) = Action.async {
