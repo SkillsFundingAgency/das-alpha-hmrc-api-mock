@@ -29,6 +29,8 @@ class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
 
     def empref = column[String]("EMPREF")
 
+    def pk = primaryKey("levy_decl_pk", (year, month, empref))
+
     def schemeFK = foreignKey("decl_scheme_fk", empref, schemeDAO.Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
 
     def * = (year, month, amount, empref) <>(LevyDeclarationRow.tupled, LevyDeclarationRow.unapply)
