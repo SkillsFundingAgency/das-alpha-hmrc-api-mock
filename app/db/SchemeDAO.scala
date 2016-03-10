@@ -20,6 +20,8 @@ class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def insert(cat: SchemeRow): Future[Unit] = db.run(Schemes += cat).map { _ => () }
 
+  def byUtr(utr: String): Future[Seq[SchemeRow]] = db.run(Schemes.filter(_.utr === utr).result)
+
   class SchemeTable(tag: Tag) extends Table[SchemeRow](tag, "SCHEME") {
 
     def empref = column[String]("EMPREF", O.PrimaryKey)
