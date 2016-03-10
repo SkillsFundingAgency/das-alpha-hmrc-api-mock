@@ -7,4 +7,6 @@ GET        /assets/*file                     controllers.Assets.versioned(path="
 
 # Routes for the API
 GET        /levy/*empref/declarations        controllers.ApiController.getLevyDeclarations(empref :EmpRef)
-GET        /levy/:utr/schemes               controllers.ApiController.getSchemesForUtr(utr)
+GET        /levy/:utr/schemes                controllers.ApiController.getSchemesForUtr(utr)
+
+GET        /                                 controllers.Application.index

@@ -26,6 +26,4 @@ class ApiController @Inject()(implicit exec: ExecutionContext) extends Controlle
 
     Future.successful(Ok(Json.toJson(emprefs)))
   }
-
-
 }
