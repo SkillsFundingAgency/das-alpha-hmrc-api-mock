@@ -14,13 +14,13 @@ class OrganisationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
   import driver.api._
 
-  private val Organisations = TableQuery[OrganisationTable]
+  val Organisations = TableQuery[OrganisationTable]
 
   def all(): Future[Seq[OrganisationRow]] = db.run(Organisations.result)
 
   def insert(cat: OrganisationRow): Future[Unit] = db.run(Organisations += cat).map { _ => () }
 
-  private class OrganisationTable(tag: Tag) extends Table[OrganisationRow](tag, "ORGANISATION") {
+  class OrganisationTable(tag: Tag) extends Table[OrganisationRow](tag, "ORGANISATION") {
 
     def utr = column[String]("UTR", O.PrimaryKey)
 

@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 case class LevyDeclarationRow(year: Int, month: Int, amount: BigDecimal, empref: String)
 
-class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val schemeDAO: SchemeDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import driver.api._
 
@@ -20,7 +20,7 @@ class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   def insert(cat: LevyDeclarationRow): Future[Unit] = db.run(LevyDeclarations += cat).map { _ => () }
 
-  private class LevyDeclarationTable(tag: Tag) extends Table[LevyDeclarationRow](tag, "LEVY_DECLARATION") {
+  class LevyDeclarationTable(tag: Tag) extends Table[LevyDeclarationRow](tag, "LEVY_DECLARATION") {
     def year = column[Int]("YEAR")
 
     def month = column[Int]("MONTH")
@@ -28,6 +28,8 @@ class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
     def amount = column[BigDecimal]("AMOUNT")
 
     def empref = column[String]("EMPREF")
+
+    def schemeFK = foreignKey("decl_scheme_fk", empref, schemeDAO.Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
 
     def * = (year, month, amount, empref) <>(LevyDeclarationRow.tupled, LevyDeclarationRow.unapply)
   }
