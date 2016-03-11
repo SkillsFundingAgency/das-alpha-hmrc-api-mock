@@ -1,0 +1,61 @@
+FORMAT: 1A
+HOST: https://guarded-citadel-53816.herokuapp.com
+
+# Apprenticeships Levy
+
+Apprenticeships Levy is an api to allow applications to retrieve information 
+relating to the amount of Apprenticeship Levy declared by organisations. 
+
+Individual Levy declarations are made against a PAYE scheme, where a scheme is
+identified by an Employer Reference (EmpRef). The API provides a way to retrieve
+up to 36 recent months of levy declarations.
+
+The system can collect a number of PAYE schemes together and relate them to a 
+company by way of a UTR (Unique Tax Reference). The API provides a way to
+list all of the EmpRefs related to a UTR.
+
+## PAYE schemes associated with a company [/levy/{utr}/schemes]
+
+### List all PAYE Schemes associated with a company for Levy [GET]
+
+List the EmpRefs of any PAYE schemes related to the UTR.
+
++ Parameters
+    + utr: 1234567 (number) - the UTR of the organisation that manages the PAYE schemes
+
++ Response 200 (application/json)
+
+        [
+            "123/AB12345",
+            "321/ZX54321"
+        ]
+
+## Levy declarations for a PAYE scheme [/levy/{empref}/declarations]
+
+### List the recent levy declarations for a PAYE scheme [GET]
+
+This will list the most recent levy declarations for the PAYE scheme identified
+but the EmpRef. The response will contain declarations for up to the 36 most recent
+months.
+
++ Parameters
+    + empref: 123/AB12345 (string) - the Employer Reference of the PAYE scheme. This is formed of
+                         two parts, the Tax Office Number and the Tax Office Reference,
+                         separated by a '/'.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+               "empref": "123/AB12345",
+                "declarations": [
+                {
+                    "payrollMonth": {
+                        "year": 2016,
+                        "month": 1
+                    },
+                    "amount": 3200
+                }
+                ]
+            }
