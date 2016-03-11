@@ -23,7 +23,7 @@ class ApiController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDecl
 
       val englishFraction = EnglishFraction(0.83, new LocalDate)
 
-      Ok(Json.toJson(LevyDeclarations(empref, englishFraction, decls)))
+      Ok(Json.toJson(LevyDeclarations(empref, englishFraction, 15000, decls)))
     }
   }
 
