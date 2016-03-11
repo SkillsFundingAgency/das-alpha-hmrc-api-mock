@@ -1,0 +1,27 @@
+reporter: apiary
+custom:
+  apiaryApiKey: 1199ebab81193214e73462ad3aa82f3b
+  apiaryApiName: apprenticeshipslevy
+dry-run: null
+hookfiles: null
+language: nodejs
+sandbox: false
+server: sbt run
+server-wait: 15
+init: false
+names: false
+only: []
+output: []
+header: []
+sorted: false
+user: null
+inline-errors: false
+details: false
+method: []
+color: true
+level: info
+timestamp: false
+silent: false
+path: []
+blueprint: apiary.apib
+endpoint: 'http://localhost:9000'
