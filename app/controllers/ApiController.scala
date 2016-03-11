@@ -3,7 +3,8 @@ package controllers
 import javax.inject._
 
 import db.{LevyDeclarationDAO, SchemeDAO}
-import models.{LevyDeclaration, LevyDeclarations, PayrollMonth}
+import models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.domain.EmpRef
@@ -20,7 +21,9 @@ class ApiController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDecl
         LevyDeclaration(PayrollMonth(d.year, d.month), d.amount)
       }
 
-      Ok(Json.toJson(LevyDeclarations(empref, decls)))
+      val englishFraction = EnglishFraction(0.83, new LocalDate)
+
+      Ok(Json.toJson(LevyDeclarations(empref, englishFraction, decls)))
     }
   }
 

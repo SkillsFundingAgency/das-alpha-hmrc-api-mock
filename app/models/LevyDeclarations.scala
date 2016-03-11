@@ -1,5 +1,6 @@
 package models
 
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.EmpRef
 
@@ -11,11 +12,17 @@ object PayrollMonth {
 
 case class LevyDeclaration(payrollMonth: PayrollMonth, amount: BigDecimal)
 
-object LevyDeclaration{
+object LevyDeclaration {
   implicit val formats = Json.format[LevyDeclaration]
 }
 
-case class LevyDeclarations(empref: EmpRef, declarations: Seq[LevyDeclaration])
+case class EnglishFraction(fraction: BigDecimal, calculatedAt: LocalDate)
+
+object EnglishFraction {
+  implicit val formats = Json.format[EnglishFraction]
+}
+
+case class LevyDeclarations(empref: EmpRef, englishFraction: EnglishFraction, declarations: Seq[LevyDeclaration])
 
 object LevyDeclarations {
   implicit val formats = Json.format[LevyDeclarations]
