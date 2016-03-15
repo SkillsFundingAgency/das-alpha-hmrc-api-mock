@@ -22,7 +22,7 @@ object EnglishFraction {
   implicit val formats = Json.format[EnglishFraction]
 }
 
-case class LevyDeclarations(empref: EmpRef, englishFraction: EnglishFraction, totalLevyApplied:BigDecimal, declarations: Seq[LevyDeclaration])
+case class LevyDeclarations(empref: EmpRef, englishFraction: EnglishFraction, totalLevyAllowanceApplied:BigDecimal, declarations: Seq[LevyDeclaration])
 
 object LevyDeclarations {
   implicit val formats = Json.format[LevyDeclarations]
