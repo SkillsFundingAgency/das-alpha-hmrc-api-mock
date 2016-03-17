@@ -3,45 +3,34 @@ package controllers
 import javax.inject.Inject
 
 import actions.client.ClientUserAction
-import db.client.{DASUserDAO, SchemeDAO}
+import db.client.{DASUserDAO, SchemeClaimDAO, SchemeDAO}
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.Controller
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class UserData(name: String, password: String)
 
-class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO, UserAction:ClientUserAction)(implicit exec: ExecutionContext) extends Controller {
+class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO, UserAction: ClientUserAction, schemeClaimDAO: SchemeClaimDAO)(implicit exec: ExecutionContext) extends Controller {
+  def index = UserAction.async { request =>
+    schemeClaimDAO.forUser(request.user.id).map { claimedSchemes =>
+      Ok(views.html.client.index(request.user, claimedSchemes))
+    }
+  }
 
-  val userForm = Form(
-    mapping(
-      "username" -> text,
-      "password" -> text
-    )(UserData.apply)(UserData.unapply)
+  val claimMapping = Form(
+    "empref" -> text
   )
 
-  def index = UserAction.async {
-    schemeDAO.all().map(schemes => Ok(views.html.index(schemes)))
-  }
 
-  def showLogin = Action {
-    Ok(views.html.client.login(userForm))
-  }
-
-  def handleLogin = Action.async { implicit request =>
-    userForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(views.html.client.login(formWithErrors))),
-      userData => {
-        dasUserDAO.validate(userData.name, userData.password).map {
-          case Some(user) => Redirect(routes.ClientController.index()).withSession(("userId", user.id.toString))
-          case None => Ok(views.html.client.login(userForm.withError("username", "Bad user name or password")))
-        }
-      }
+  def claimScheme = UserAction.async { implicit request =>
+    claimMapping.bindFromRequest().fold(
+      formWithErrors => Future.successful(Redirect(controllers.routes.ClientController.index())),
+      empref => handleClaim(empref).map(_ => Redirect(controllers.routes.ClientController.index()))
     )
   }
 
-  def logout = Action {
-    Redirect(routes.ClientController.showLogin()).withNewSession
-  }
+  def handleClaim(empref: String): Future[Boolean] = ???
+
 }

@@ -11,13 +11,16 @@ import scala.concurrent.{ExecutionContext, Future}
 case class SchemeClaimRow(empref: String, userId: Long, authToken: String, validUntil: Date, refreshToken: Option[String])
 
 trait SchemeClaimModule extends DBModule {
+
   import driver.api._
 
   val SchemeClaims = TableQuery[SchemeClaimTable]
 
+  def forUser(userId: Long): Future[Seq[SchemeClaimRow]] = db.run(SchemeClaims.filter(_.dasUserId === userId).result)
+
   def insert(cat: SchemeClaimRow): Future[Unit] = db.run(SchemeClaims += cat).map { _ => () }
 
-  class SchemeClaimTable(tag: Tag) extends Table[SchemeClaimRow](tag, "SCHEME") {
+  class SchemeClaimTable(tag: Tag) extends Table[SchemeClaimRow](tag, "SCHEME_CLAIM") {
 
     def empref = column[String]("EMPREF", O.PrimaryKey)
 
@@ -35,4 +38,4 @@ trait SchemeClaimModule extends DBModule {
 
 }
 
-class SchemeClaimDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
+class SchemeClaimDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends SchemeClaimModule
