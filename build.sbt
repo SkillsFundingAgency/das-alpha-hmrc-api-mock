@@ -17,10 +17,12 @@ libraryDependencies ++= Seq(
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
 libraryDependencies ++= Seq(
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",
   "uk.gov.hmrc" %% "domain" % "3.5.0",
   "com.typesafe.play" %% "play-slick" % "2.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
-  "com.h2database" % "h2" % "1.4.191"
+  "com.h2database" % "h2" % "1.4.191",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 
