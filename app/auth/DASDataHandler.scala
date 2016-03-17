@@ -4,7 +4,8 @@ import java.security.SecureRandom
 import java.sql.Date
 import javax.inject.Inject
 
-import db._
+import cats.data.OptionT
+import cats.std.future._
 import db.outh2._
 import org.apache.commons.codec.binary.Hex
 import org.mindrot.jbcrypt.BCrypt
@@ -45,11 +46,14 @@ class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, cl
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[UserRow]]] = ???
 
-  override def getStoredAccessToken(authInfo: AuthInfo[UserRow]): Future[Option[AccessToken]] = ???
+  override def getStoredAccessToken(authInfo: AuthInfo[UserRow]): Future[Option[AccessToken]] = {
+    OptionT(accessTokens.find(authInfo.user.id, authInfo.clientId)).map { token =>
+      AccessToken(token.accessToken, token.refreshToken, token.scope, token.expiresIn, token.createdAt)
+    }.value
+  }
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[UserRow]]] = {
-    import cats.data.OptionT
-    import cats.std.future._
+
 
     val ot = for {
       token <- OptionT(authCodeDAO.find(code))
@@ -59,7 +63,7 @@ class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, cl
     ot.value
   }
 
-  override def deleteAuthCode(code: String): Future[Unit] = ???
+  override def deleteAuthCode(code: String): Future[Unit] = authCodeDAO.delete(code).map(_ => ())
 
   override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[UserRow]]] = ???
 

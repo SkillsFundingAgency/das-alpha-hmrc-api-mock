@@ -26,6 +26,10 @@ trait AccessTokenModule extends DBModule {
 
   def all(): Future[Seq[AccessTokenRow]] = db.run(AccessTokens.result)
 
+  def find(userId:Long, clientId:Option[String]):Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(at => at.userId === userId && at.clientId == clientId).result.headOption
+  }
+
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
       _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.userId === token.userId).delete
@@ -33,20 +37,20 @@ trait AccessTokenModule extends DBModule {
     } yield a.result
   }
 
-  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "AccessToken") {
-    def accessToken = column[String]("access_token", O.PrimaryKey)
+  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "ACCESS_TOKEN") {
+    def accessToken = column[String]("ACCESS_TOKEN", O.PrimaryKey)
 
-    def refreshToken = column[Option[String]]("refresh_token")
+    def refreshToken = column[Option[String]]("REFRESH_TOKEN")
 
-    def userId = column[Long]("user_id")
+    def userId = column[Long]("USER_ID")
 
-    def scope = column[Option[String]]("scope")
+    def scope = column[Option[String]]("SCOPE")
 
-    def expiresIn = column[Option[Long]]("expires_in")
+    def expiresIn = column[Option[Long]]("EXPIRES_IN")
 
-    def createdAt = column[Date]("created_at")
+    def createdAt = column[Date]("CREATED_AT")
 
-    def clientId = column[Option[String]]("client_id")
+    def clientId = column[Option[String]]("CLIENT_ID")
 
     def * = (accessToken, refreshToken, userId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 

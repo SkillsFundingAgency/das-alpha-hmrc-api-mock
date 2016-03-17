@@ -16,6 +16,8 @@ trait AuthCodeModule extends DBModule {
 
   def find(code: String): Future[Option[AuthCodeRow]] = db.run(AuthCodes.filter(_.authorizationCode === code).result.headOption)
 
+  def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
+
   val AuthCodes = TableQuery[AuthCodeTable]
 
   class AuthCodeTable(tag: Tag) extends Table[AuthCodeRow](tag, "AUTH_CODES") {
