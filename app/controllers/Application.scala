@@ -1,8 +1,8 @@
 package controllers
 
 import javax.inject.Inject
-
-import db.{UserDAO, SchemeDAO}
+import db.levy.SchemeDAO
+import db.outh2.UserDAO
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}

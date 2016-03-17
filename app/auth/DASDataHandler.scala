@@ -5,6 +5,7 @@ import java.sql.Date
 import javax.inject.Inject
 
 import db._
+import db.outh2._
 import org.apache.commons.codec.binary.Hex
 import org.mindrot.jbcrypt.BCrypt
 

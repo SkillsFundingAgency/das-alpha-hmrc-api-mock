@@ -1,16 +1,16 @@
-package db
+package db.levy
 
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
 
 case class SchemeRow(empref: String, utr: Option[String])
 
-class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val organisationDAO: OrganisationDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
+class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val organisationDAO: OrganisationDAO) extends DBModule {
 
   import driver.api._
 
@@ -32,5 +32,4 @@ class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
     def * = (empref, utr) <>(SchemeRow.tupled, SchemeRow.unapply)
   }
-
 }

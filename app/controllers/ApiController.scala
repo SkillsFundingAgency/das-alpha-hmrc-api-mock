@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import db.{LevyDeclarationDAO, SchemeDAO}
+import db.levy.{LevyDeclarationDAO, SchemeDAO}
 import models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
 import org.joda.time.LocalDate
 import play.api.libs.json.Json

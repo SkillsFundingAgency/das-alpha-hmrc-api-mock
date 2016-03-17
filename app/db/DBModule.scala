@@ -1,7 +1,6 @@
 package db
 
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.HasDatabaseConfigProvider
+import slick.driver.JdbcProfile
 
-trait DBModule {
-  def dbConfigProvider: DatabaseConfigProvider
-}
+trait DBModule extends HasDatabaseConfigProvider[JdbcProfile]

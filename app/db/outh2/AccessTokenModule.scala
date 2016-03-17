@@ -1,11 +1,10 @@
-package db
+package db.outh2
 
 import java.sql.Date
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.dbio.Effect.Read
-import slick.driver.JdbcProfile
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,7 +16,7 @@ case class AccessTokenRow(
                            createdAt: Date,
                            clientId: Option[String])
 
-trait AccessTokenModule extends HasDatabaseConfigProvider[JdbcProfile] {
+trait AccessTokenModule extends DBModule {
 
   import driver.api._
 

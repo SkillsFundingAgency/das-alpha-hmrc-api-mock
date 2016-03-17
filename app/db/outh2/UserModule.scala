@@ -1,15 +1,15 @@
-package db
+package db.outh2
 
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.Future
 
 case class UserRow(id: Long, name: String, hashedPassword: String)
 
-trait UserModule extends HasDatabaseConfigProvider[JdbcProfile] {
+trait UserModule extends DBModule {
 
   import driver.api._
 

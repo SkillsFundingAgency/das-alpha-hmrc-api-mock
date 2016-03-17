@@ -1,16 +1,16 @@
-package db
+package db.levy
 
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
 
 case class OrganisationRow(utr: String, name: String)
 
-class OrganisationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class OrganisationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends DBModule {
 
   import driver.api._
 

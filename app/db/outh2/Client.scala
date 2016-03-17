@@ -1,15 +1,15 @@
-package db
+package db.outh2
 
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class ClientRow(id: String, secret: Option[String], redirectUri: Option[String], scope: Option[String])
 
-class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends DBModule {
 
   import driver.api._
 

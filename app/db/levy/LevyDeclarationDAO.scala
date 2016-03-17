@@ -1,16 +1,16 @@
-package db
+package db.levy
 
 import javax.inject.Inject
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import db.DBModule
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
 
 case class LevyDeclarationRow(year: Int, month: Int, amount: BigDecimal, empref: String)
 
-class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val schemeDAO: SchemeDAO) extends HasDatabaseConfigProvider[JdbcProfile] {
+class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val schemeDAO: SchemeDAO) extends DBModule {
 
   import driver.api._
 
