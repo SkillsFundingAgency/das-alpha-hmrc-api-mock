@@ -7,7 +7,7 @@ import actions.client.ClientUserAction
 import cats.data.OptionT
 import cats.std.future._
 import db.client.{SchemeClaimRow, DASUserDAO, SchemeClaimDAO, SchemeDAO}
-import db.outh2.AuthCodeDAO
+import db.outh2.{AuthCodeRow, AuthCodeDAO}
 import org.joda.time.DateTime
 import play.api.data.Form
 import play.api.data.Forms._
@@ -37,52 +37,45 @@ class ClientController @Inject()(ws: WSClient, schemeDAO: SchemeDAO, dasUserDAO:
   }
 
   def claimCallback(code: Option[String]) = UserAction.async { implicit request =>
+    val redirectToIndex = Redirect(controllers.client.routes.ClientController.index())
+
     code match {
       case None => Future.successful(Redirect(controllers.client.routes.ClientController.index()))
-      case Some(c) => convertCode(c, request.user.id).flatMap { case Some(scr) =>
-        schemeClaimDAO.insert(scr).map { _ =>
-          Redirect(controllers.client.routes.ClientController.index())
-        }
+      case Some(c) => convertCode(c, request.user.id).flatMap {
+        case Some(scr) => schemeClaimDAO.insert(scr).map { _ => redirectToIndex }
+        case None => Future.successful(redirectToIndex)
       }
     }
   }
 
-  case class AccessTokenResponse(access_token: String, expires_in: Long, scope: Option[String], refreshToken: Option[String], token_type: String)
+  case class AccessTokenResponse(access_token: String, expires_in: Long, scope: String, refreshToken: Option[String], token_type: String)
 
   object AccessTokenResponse {
     implicit val format = Json.format[AccessTokenResponse]
   }
 
   def convertCode(code: String, userId: Long)(implicit requestHeader: RequestHeader): Future[Option[SchemeClaimRow]] = {
-    val f = authCodeDAO.find(code).map { ac =>
-      ac map { authCode =>
-        val params = Map(
-          "grant_type" -> "authorization_code",
-          "code" -> authCode.authorizationCode,
-          "redirect_uri" -> "http://localhost:9000/",
-          "client_id" -> authCode.clientId.get.toString,
-          "client_secret" -> "secret1"
-        ).map{case (k,v) => k -> Seq(v)}
-
-        callAuthServer(userId, params)
-      }
-    }
-    f.flatMap {
-      case Some(f2) => f2.map(Some(_))
+    authCodeDAO.find(code).flatMap {
+      case Some(authCode) => callAuthServer(userId, authCode).map(Some(_))
       case None => Future.successful(None)
     }
   }
 
-  def callAuthServer(userId: Long, params: Map[String, Seq[String]])(implicit rh: RequestHeader): Future[SchemeClaimRow] = {
-    val url: String = controllers.routes.OAuth2Controller.accessToken().absoluteURL()
-    println(url)
-    println(params)
-    ws.url(url).post(params).map { response =>
+  def callAuthServer(userId: Long, authCode: AuthCodeRow)(implicit rh: RequestHeader): Future[SchemeClaimRow] = {
+    val params = Map(
+      "grant_type" -> "authorization_code",
+      "code" -> authCode.authorizationCode,
+      "redirect_uri" -> "http://localhost:9000/",
+      "client_id" -> authCode.clientId.get.toString,
+      "client_secret" -> "secret1"
+    ).map { case (k, v) => k -> Seq(v) }
+
+    ws.url(controllers.routes.OAuth2Controller.accessToken().absoluteURL()).post(params).map { response =>
       response.status match {
         case 200 =>
           val r = response.json.validate[AccessTokenResponse].get
           val validUntil = DateTime.now.plus(r.expires_in * 1000)
-          SchemeClaimRow(r.scope.get, userId, r.access_token, new Date(validUntil.getMillis), r.refreshToken)
+          SchemeClaimRow(r.scope, userId, r.access_token, new Date(validUntil.getMillis), r.refreshToken)
       }
     }
   }
