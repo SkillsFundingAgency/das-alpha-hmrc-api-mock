@@ -6,6 +6,7 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.std.future._
+import db.client.{DASUserDAO, UserRow}
 import db.outh2._
 import org.apache.commons.codec.binary.Hex
 import org.mindrot.jbcrypt.BCrypt
@@ -14,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
 
-class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO) extends DataHandler[UserRow] {
+class DASDataHandler @Inject()(implicit ec: ExecutionContext, dasUsers: DASUserDAO, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO) extends DataHandler[UserRow] {
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
       case Some(cred) => clients.validate(cred.clientId, cred.clientSecret, request.grantType)
@@ -57,7 +58,7 @@ class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, cl
 
     val ot = for {
       token <- OptionT(authCodeDAO.find(code))
-      user <- OptionT(users.byId(token.userId))
+      user <- OptionT(dasUsers.byId(token.userId))
     } yield AuthInfo(user, token.clientId, token.scope, token.redirectUri)
 
     ot.value
@@ -71,7 +72,7 @@ class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, cl
 
   override def findUser(request: AuthorizationRequest): Future[Option[UserRow]] = {
     request.clientCredential.map { cred =>
-      users.byName(cred.clientId).map(_.filter(u => BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)))
+      dasUsers.byName(cred.clientId).map(_.filter(u => BCrypt.checkpw(cred.clientSecret.get, u.hashedPassword)))
     } match {
       case None => Future.successful(None)
       case Some(f) => f

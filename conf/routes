@@ -9,6 +9,9 @@ GET         /assets/*file                     controllers.Assets.versioned(path=
 GET         /levy/*empref/declarations        controllers.ApiController.getLevyDeclarations(empref :EmpRef)
 GET         /levy/:utr/schemes                controllers.ApiController.getSchemesForUtr(utr)
 
-GET         /                                 controllers.Application.index
+GET         /client                           controllers.ClientController.index
 
-POST        /oauth2/access_token               controllers.OAuth2Controller.accessToken
+POST        /oauth2/access_token              controllers.OAuth2Controller.accessToken
+
+GET         /client/login                     controllers.ClientController.showLogin
+POST        /client/login                     controllers.ClientController.handleLogin

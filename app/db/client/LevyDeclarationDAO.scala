@@ -1,4 +1,4 @@
-package db.levy
+package db.client
 
 import javax.inject.Inject
 
