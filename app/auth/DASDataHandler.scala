@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
 
 
-class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, clients: ClientDAO, accessTokens: AccessTokenDAO) extends DataHandler[UserRow] {
+class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, clients: ClientDAO, accessTokens: AccessTokenDAO, authCodeDAO: AuthCodeDAO) extends DataHandler[UserRow] {
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     request.clientCredential match {
       case Some(cred) => clients.validate(cred.clientId, cred.clientSecret, request.grantType)
@@ -47,7 +47,17 @@ class DASDataHandler @Inject()(implicit ec: ExecutionContext, users: UserDAO, cl
 
   override def getStoredAccessToken(authInfo: AuthInfo[UserRow]): Future[Option[AccessToken]] = ???
 
-  override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[UserRow]]] = ???
+  override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[UserRow]]] = {
+    import cats.data.OptionT
+    import cats.std.future._
+
+    val ot = for {
+      token <- OptionT(authCodeDAO.find(code))
+      user <- OptionT(users.byId(token.userId))
+    } yield AuthInfo(user, token.clientId, token.scope, token.redirectUri)
+
+    ot.value
+  }
 
   override def deleteAuthCode(code: String): Future[Unit] = ???
 

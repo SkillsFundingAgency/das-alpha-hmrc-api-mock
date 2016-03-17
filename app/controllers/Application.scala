@@ -11,7 +11,6 @@ import scala.concurrent.ExecutionContext
 
 class Application @Inject()(schemeDAO: SchemeDAO, userDAO: UserDAO)(implicit exec: ExecutionContext) extends Controller {
 
-
   def index = Action.async {
     schemeDAO.all().map(schemes => Ok(views.html.index(schemes)))
   }

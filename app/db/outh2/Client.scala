@@ -9,7 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class ClientRow(id: String, secret: Option[String], redirectUri: Option[String], scope: Option[String])
 
-class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends DBModule {
+class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends DBModule {
 
   import driver.api._
 
@@ -20,15 +20,15 @@ class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
   }
 
   class ClientTable(tag: Tag) extends Table[ClientRow](tag, "CLIENT") {
-    def id = column[String]("id", O.PrimaryKey)
+    def id = column[String]("ID", O.PrimaryKey)
 
-    def secret = column[Option[String]]("secret")
+    def secret = column[Option[String]]("SECRET")
 
-    def redirectUri = column[Option[String]]("redirect_uri")
+    def redirectUri = column[Option[String]]("REDIRECT_URI")
 
-    def scope = column[Option[String]]("scope")
+    def scope = column[Option[String]]("SCOPE")
 
-    def grantType = column[String]("grant_type")
+    def grantType = column[String]("GRANT_TYPE")
 
     def * = (id, secret, redirectUri, scope) <>(ClientRow.tupled, ClientRow.unapply)
   }

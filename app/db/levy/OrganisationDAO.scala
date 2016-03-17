@@ -4,13 +4,12 @@ import javax.inject.Inject
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class OrganisationRow(utr: String, name: String)
 
-class OrganisationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends DBModule {
+class OrganisationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends DBModule {
 
   import driver.api._
 

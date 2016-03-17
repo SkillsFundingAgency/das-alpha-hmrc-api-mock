@@ -4,13 +4,12 @@ import javax.inject.Inject
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class LevyDeclarationRow(year: Int, month: Int, amount: BigDecimal, empref: String)
 
-class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val schemeDAO: SchemeDAO) extends DBModule {
+class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val schemeDAO: SchemeDAO)(implicit val ec: ExecutionContext) extends DBModule {
 
   import driver.api._
 

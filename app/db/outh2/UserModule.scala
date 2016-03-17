@@ -5,7 +5,7 @@ import javax.inject.Inject
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class UserRow(id: Long, name: String, hashedPassword: String)
 
@@ -16,6 +16,8 @@ trait UserModule extends DBModule {
   val Users = TableQuery[UserTable]
 
   def all(): Future[Seq[UserRow]] = db.run(Users.result)
+
+  def byId(id: Long): Future[Option[UserRow]] = db.run(Users.filter(_.id === id).result.headOption)
 
   def byName(s: String): Future[Option[UserRow]] = db.run(Users.filter(u => u.name === s).result.headOption)
 
@@ -33,4 +35,4 @@ trait UserModule extends DBModule {
 
 }
 
-class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends UserModule
+class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends UserModule
