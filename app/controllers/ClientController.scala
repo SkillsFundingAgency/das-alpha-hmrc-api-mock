@@ -1,6 +1,7 @@
 package controllers
 
 import javax.inject.Inject
+import actions.client.ClientUserAction
 import db.client.{DASUserDAO, SchemeDAO}
 import play.api.data.Form
 import play.api.data.Forms._
@@ -10,7 +11,7 @@ import scala.concurrent.{Future, ExecutionContext}
 
 case class UserData(name: String, password: String)
 
-class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO)(implicit exec: ExecutionContext) extends Controller {
+class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO, UserAction:ClientUserAction)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(
     mapping(
@@ -19,7 +20,7 @@ class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO)(i
     )(UserData.apply)(UserData.unapply)
   )
 
-  def index = Action.async {
+  def index = UserAction.async {
     schemeDAO.all().map(schemes => Ok(views.html.index(schemes)))
   }
 
@@ -37,5 +38,9 @@ class ClientController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO)(i
         }
       }
     )
+  }
+
+  def logout = Action {
+    Redirect(routes.ClientController.showLogin()).withNewSession
   }
 }
