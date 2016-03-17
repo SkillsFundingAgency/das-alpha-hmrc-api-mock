@@ -1,13 +1,14 @@
 package controllers
 
 import javax.inject.Inject
+
 import actions.client.ClientUserAction
 import db.client.{DASUserDAO, SchemeDAO}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 case class UserData(name: String, password: String)
 
