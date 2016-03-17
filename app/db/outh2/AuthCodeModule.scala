@@ -18,12 +18,17 @@ trait AuthCodeModule extends DBModule {
 
   def delete(code: String): Future[Int] = db.run(AuthCodes.filter(_.authorizationCode === code).delete)
 
+  def create(code: String, gatewayUserId: Long, clientId: String, empref:String): Future[Int] = {
+    val r = AuthCodeRow(code, gatewayUserId, None, new Date(System.currentTimeMillis()), Some(empref), Some(clientId), 100000)
+    db.run(AuthCodes += r)
+  }
+
   val AuthCodes = TableQuery[AuthCodeTable]
 
   class AuthCodeTable(tag: Tag) extends Table[AuthCodeRow](tag, "AUTH_CODES") {
     def authorizationCode = column[String]("AUTHORIZATION_CODE", O.PrimaryKey)
 
-    def userId = column[Long]("USER_ID")
+    def userId = column[Long]("GATEWAY_USER_ID")
 
     def redirectUri = column[Option[String]]("REDIRECT_URI")
 

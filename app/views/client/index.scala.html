@@ -1,6 +1,6 @@
-@import db.client.UserRow
+@import db.client.DASUserRow
 @import db.client.SchemeClaimRow
-@(user: UserRow, claimedSchemes: Seq[SchemeClaimRow])
+@(user: DASUserRow, claimedSchemes: Seq[SchemeClaimRow])
 
 @main("Welcome to DAS") {
     <h2>Welcome @user.name</h2>
@@ -12,7 +12,7 @@
     </div>
     <div>
         <h3>Claim a scheme</h3>
-        <form action="@controllers.routes.ClientController.claimScheme" method="post">
+        <form action="@controllers.client.routes.ClientController.claimScheme" method="post">
             <label for="empref">PAYE Scheme Employer Reference (e.g. 123/AB12345)</label>
             <input type="text" id="empref" name="empref"/>
             <input type="submit" value="Claim"/>

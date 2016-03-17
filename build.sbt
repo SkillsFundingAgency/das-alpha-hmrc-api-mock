@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
 libraryDependencies ++= Seq(
+  ws,
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",
   "uk.gov.hmrc" %% "domain" % "3.5.0",
   "com.typesafe.play" %% "play-slick" % "2.0.0",

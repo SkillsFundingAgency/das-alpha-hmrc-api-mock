@@ -9,12 +9,21 @@ GET         /assets/*file                     controllers.Assets.versioned(path=
 GET         /levy/*empref/declarations        controllers.ApiController.getLevyDeclarations(empref :EmpRef)
 GET         /levy/:utr/schemes                controllers.ApiController.getSchemesForUtr(utr)
 
-GET         /client                           controllers.ClientController.index
+GET         /client                           controllers.client.ClientController.index
 
 POST        /oauth2/access_token              controllers.OAuth2Controller.accessToken
 
-GET         /client/logout                    controllers.client.LoginController.logout
-GET         /client/login                     controllers.client.LoginController.showLogin
-POST        /client/login                     controllers.client.LoginController.handleLogin
+GET         /client/logout                    controllers.client.ClientLoginController.logout
+GET         /client/login                     controllers.client.ClientLoginController.showLogin
+POST        /client/login                     controllers.client.ClientLoginController.handleLogin
 
-POST        /client/claimScheme               controllers.ClientController.claimScheme
+POST        /client/claimScheme               controllers.client.ClientController.claimScheme
+GET         /client/claimCallback             controllers.client.ClientController.claimCallback(code:Option[String])
+
+GET         /gateway/logout                   controllers.gateway.GatewayLoginController.logout
+GET         /gateway/login                    controllers.gateway.GatewayLoginController.showLogin
+POST        /gateway/login                    controllers.gateway.GatewayLoginController.handleLogin
+
+GET         /gateway/auth                     controllers.gateway.ClaimAuthController.auth(empref:String, clientId:String, redirectUri :String)
+GET         /gateway/confirm                  controllers.gateway.ClaimAuthController.confirm(empref:String, clientId:String, redirectUri :String)
+GET         /gateway/deny                     controllers.gateway.ClaimAuthController.deny(redirectUri :String)

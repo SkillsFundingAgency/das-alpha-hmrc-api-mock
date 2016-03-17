@@ -7,25 +7,25 @@ import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class UserRow(id: Long, name: String, hashedPassword: String)
+case class DASUserRow(id: Long, name: String, hashedPassword: String)
 
 trait DASUserModule extends DBModule {
 
   import driver.api._
 
-  val DASUsers = TableQuery[UserTable]
+  val DASUsers = TableQuery[DASUserTable]
 
-  def all(): Future[Seq[UserRow]] = db.run(DASUsers.result)
+  def all(): Future[Seq[DASUserRow]] = db.run(DASUsers.result)
 
-  def validate(username:String, password:String):Future[Option[UserRow]] = db.run{
+  def validate(username:String, password:String):Future[Option[DASUserRow]] = db.run{
     DASUsers.filter(u => u.name === username && u.password === password).result.headOption
   }
 
-  def byId(id: Long): Future[Option[UserRow]] = db.run(DASUsers.filter(_.id === id).result.headOption)
+  def byId(id: Long): Future[Option[DASUserRow]] = db.run(DASUsers.filter(_.id === id).result.headOption)
 
-  def byName(s: String): Future[Option[UserRow]] = db.run(DASUsers.filter(u => u.name === s).result.headOption)
+  def byName(s: String): Future[Option[DASUserRow]] = db.run(DASUsers.filter(u => u.name === s).result.headOption)
 
-  class UserTable(tag: Tag) extends Table[UserRow](tag, "DAS_USER") {
+  class DASUserTable(tag: Tag) extends Table[DASUserRow](tag, "DAS_USER") {
 
     def id = column[Long]("ID", O.PrimaryKey)
 
@@ -33,7 +33,7 @@ trait DASUserModule extends DBModule {
 
     def password = column[String]("PASSWORD")
 
-    def * = (id, name, password) <>(UserRow.tupled, UserRow.unapply)
+    def * = (id, name, password) <>(DASUserRow.tupled, DASUserRow.unapply)
 
   }
 

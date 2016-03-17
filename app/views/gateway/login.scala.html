@@ -1,12 +1,13 @@
 @import play.api.data.Form
-@import controllers.client.ClientUserData
+@import controllers.gateway.UserData
+@import controllers.gateway.routes.GatewayLoginController
 
-@(form: Form[ClientUserData])
+@(form: Form[UserData])
 
-@main("Login in to DAS") {
+@main("Login in to Government Gateway") {
     <div>
-        <h1>Login to DAS</h1>
-        <form method="post" action="@controllers.client.routes.ClientLoginController.handleLogin()">
+        <h1>Login to Government Gateway</h1>
+        <form method="post" action="@GatewayLoginController.handleLogin()">
             <div id="errors">
             @form.errors.map { e => <div>@e.messages.head</div> }
             </div>
