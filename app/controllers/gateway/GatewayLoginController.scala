@@ -32,7 +32,7 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
         gatewayUserDAO.validate(userData.name, userData.password).map {
           case Some(user) =>
             request.session.get("uri") match {
-              case Some(uri) => Redirect(uri).withSession((UserAction.sessionKey, user.id.toString))
+              case Some(uri) => Redirect(uri).removingFromSession("uri").addingToSession((UserAction.sessionKey, user.id.toString))
               case None => Redirect(controllers.client.routes.ClientController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
             }
           case None => Ok(views.html.gateway.login(userForm.withError("username", "Bad user name or password")))

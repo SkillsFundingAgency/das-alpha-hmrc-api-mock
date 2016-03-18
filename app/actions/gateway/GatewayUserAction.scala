@@ -1,7 +1,6 @@
 package actions.gateway
 
 import com.google.inject.Inject
-import db.client.{DASUserDAO, DASUserRow}
 import db.gateway.{GatewayUserDAO, GatewayUserRow}
 import play.api.mvc.Results._
 import play.api.mvc._
@@ -12,14 +11,15 @@ import scala.util.Try
 
 class GatewayUserRequest[A](val request: Request[A], val user: GatewayUserRow) extends WrappedRequest[A](request)
 
-class GatewayUserAction @Inject()(gatewayUsers:GatewayUserDAO)(implicit ec: ExecutionContext)
+class GatewayUserAction @Inject()(gatewayUsers: GatewayUserDAO)(implicit ec: ExecutionContext)
   extends ActionBuilder[GatewayUserRequest]
     with ActionRefiner[Request, GatewayUserRequest] {
 
   val sessionKey = "ggUserId"
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, GatewayUserRequest[A]]] = {
-    val login = Left(Redirect(controllers.gateway.routes.GatewayLoginController.showLogin()).withSession(("uri", request.uri)))
+    implicit val rh: RequestHeader = request
+    val login = Left(Redirect(controllers.gateway.routes.GatewayLoginController.showLogin()).addingToSession("uri" -> request.uri))
 
     request.session.get(sessionKey) match {
       case None => Future.successful(login)
