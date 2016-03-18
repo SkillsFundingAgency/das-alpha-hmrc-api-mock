@@ -3,13 +3,14 @@ package controllers.gateway
 import java.security.SecureRandom
 
 import actions.gateway.GatewayUserAction
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 import db.outh2.AuthCodeDAO
 import org.apache.commons.codec.binary.Hex
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class ClaimAuthController @Inject()(UserAction: GatewayUserAction, authCodeDAO: AuthCodeDAO)(implicit ec:ExecutionContext) extends Controller {
 
   def auth(empref: String, clientId: String, redirectUri: String) = UserAction { implicit request =>

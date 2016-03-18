@@ -1,6 +1,6 @@
-package controllers
+package controllers.security
 
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 
 import auth.DASDataHandler
 import play.api.mvc.{Action, Controller}
@@ -17,6 +17,7 @@ trait MyOAuth extends OAuth2Provider {
   }
 }
 
+@Singleton
 class OAuth2Controller @Inject()(dataHandler: DASDataHandler)(implicit exec: ExecutionContext) extends Controller with MyOAuth {
   def accessToken = Action.async { implicit request =>
     issueAccessToken(dataHandler)

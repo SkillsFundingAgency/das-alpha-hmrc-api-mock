@@ -1,4 +1,4 @@
-package controllers
+package controllers.api
 
 import javax.inject._
 
@@ -13,8 +13,8 @@ import scala.concurrent.ExecutionContext
 
 
 @Singleton
-class ApiController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDeclarationDAO)(implicit exec: ExecutionContext) extends Controller {
-  def getLevyDeclarations(empref: EmpRef) = Action.async {
+class EpayeController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDeclarationDAO)(implicit exec: ExecutionContext) extends Controller {
+  def levyDeclarations(empref: EmpRef) = Action.async {
 
     levyDeclarationDAO.byEmpref(empref.value).map { ds =>
       val decls = ds.map { d =>
@@ -27,9 +27,5 @@ class ApiController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDecl
     }
   }
 
-  def getSchemesForUtr(utr: String) = Action.async {
-    schemeDAO.byUtr(utr).map { emprefs =>
-      Ok(Json.toJson(emprefs.map(_.empref)))
-    }
-  }
+  def root = Action.async { _ => ??? }
 }

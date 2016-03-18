@@ -1,6 +1,6 @@
 package controllers.gateway
 
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 
 import actions.gateway.GatewayUserAction
 import db.gateway.GatewayUserDAO
@@ -12,6 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class UserData(name: String, password: String)
 
+@Singleton
 class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserAction: GatewayUserAction)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(

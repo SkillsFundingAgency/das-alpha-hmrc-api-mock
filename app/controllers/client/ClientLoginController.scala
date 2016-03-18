@@ -1,6 +1,6 @@
 package controllers.client
 
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 
 import actions.client.ClientUserAction
 import db.client.{SchemeClaimDAO, DASUserDAO, SchemeDAO}
@@ -12,6 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class ClientUserData(name: String, password: String)
 
+@Singleton
 class ClientLoginController @Inject()(schemeDAO: SchemeDAO, dasUserDAO: DASUserDAO, UserAction: ClientUserAction, schemeClaimDAO: SchemeClaimDAO)(implicit exec: ExecutionContext) extends Controller {
 
   val userForm = Form(
