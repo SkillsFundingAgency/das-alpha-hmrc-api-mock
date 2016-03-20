@@ -1,7 +1,7 @@
 package db.client
 
 import java.sql.Date
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -38,4 +38,5 @@ trait SchemeClaimModule extends DBModule {
 
 }
 
+@Singleton
 class SchemeClaimDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends SchemeClaimModule

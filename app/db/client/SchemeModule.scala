@@ -1,6 +1,6 @@
 package db.client
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,13 +9,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class SchemeRow(empref: String, utr: Option[String])
 
-class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider, val organisationDAO: OrganisationDAO)(implicit val ec: ExecutionContext) extends DBModule {
+
+trait SchemeModule extends DBModule {
+  self: OrganisationModule =>
 
   import driver.api._
 
   val Schemes = TableQuery[SchemeTable]
-
-  def all(): Future[Seq[SchemeRow]] = db.run(Schemes.result)
 
   def insert(cat: SchemeRow): Future[Unit] = db.run(Schemes += cat).map { _ => () }
 
@@ -27,8 +27,12 @@ class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
     def utr = column[Option[String]]("UTR")
 
-    def organisationFK = foreignKey("scheme_org_fk", utr, organisationDAO.Organisations)(_.utr.?, onDelete = ForeignKeyAction.Cascade)
+    def organisationFK = foreignKey("scheme_org_fk", utr, Organisations)(_.utr.?, onDelete = ForeignKeyAction.Cascade)
 
     def * = (empref, utr) <>(SchemeRow.tupled, SchemeRow.unapply)
   }
+
 }
+
+@Singleton
+class SchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends SchemeModule with OrganisationModule

@@ -1,7 +1,7 @@
 package db.outh2
 
 import java.sql.Date
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -58,4 +58,5 @@ trait AccessTokenModule extends DBModule {
 
 }
 
+@Singleton
 class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AccessTokenModule

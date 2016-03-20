@@ -1,6 +1,6 @@
 package db.outh2
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -9,7 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class ClientRow(id: String, secret: Option[String], redirectUri: Option[String], scope: Option[String])
 
-class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends DBModule {
+
+trait ClientModule extends DBModule {
 
   import driver.api._
 
@@ -32,5 +33,7 @@ class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
     def * = (id, secret, redirectUri, scope) <>(ClientRow.tupled, ClientRow.unapply)
   }
-
 }
+
+@Singleton
+class ClientDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends ClientModule

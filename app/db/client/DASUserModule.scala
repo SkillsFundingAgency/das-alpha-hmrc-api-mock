@@ -1,6 +1,6 @@
 package db.client
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,9 +15,7 @@ trait DASUserModule extends DBModule {
 
   val DASUsers = TableQuery[DASUserTable]
 
-  def all(): Future[Seq[DASUserRow]] = db.run(DASUsers.result)
-
-  def validate(username:String, password:String):Future[Option[DASUserRow]] = db.run{
+  def validate(username: String, password: String): Future[Option[DASUserRow]] = db.run {
     DASUsers.filter(u => u.name === username && u.password === password).result.headOption
   }
 
@@ -34,9 +32,9 @@ trait DASUserModule extends DBModule {
     def password = column[String]("PASSWORD")
 
     def * = (id, name, password) <>(DASUserRow.tupled, DASUserRow.unapply)
-
   }
 
 }
 
+@Singleton
 class DASUserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends DASUserModule
