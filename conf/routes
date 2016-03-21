@@ -5,25 +5,19 @@
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
 
+GET         /                                       controllers.gateway.ApplicationController.index
+
+GET         /gateway/login                          controllers.gateway.GatewayLoginController.showLogin
+POST        /gateway/login                          controllers.gateway.GatewayLoginController.handleLogin
+GET         /gateway/logout                         controllers.gateway.GatewayLoginController.logout
+
 # Routes for the API
 GET         /epaye/*empref/levy-declarations        controllers.api.EpayeController.levyDeclarations(empref :EmpRef)
 GET         /epaye                                  controllers.api.EpayeController.root
 
 
 POST        /oauth2/access_token                    controllers.security.OAuth2Controller.accessToken
+GET         /oauth/authorize                        controllers.gateway.ClaimAuthController.auth(empref:String, clientId:String, redirectURI :String)
 
-GET         /client                                 controllers.client.ClientController.index
-GET         /client/logout                          controllers.client.ClientLoginController.logout
-GET         /client/login                           controllers.client.ClientLoginController.showLogin
-POST        /client/login                           controllers.client.ClientLoginController.handleLogin
-
-POST        /client/claimScheme                     controllers.client.ClientController.claimScheme
-GET         /client/claimCallback                   controllers.client.ClientController.claimCallback(code:Option[String])
-
-GET         /gateway/logout                         controllers.gateway.GatewayLoginController.logout
-GET         /gateway/login                          controllers.gateway.GatewayLoginController.showLogin
-POST        /gateway/login                          controllers.gateway.GatewayLoginController.handleLogin
-
-GET         /gateway/auth                           controllers.gateway.ClaimAuthController.auth(empref:String, clientId:String, redirectUri :String)
-GET         /gateway/confirm                        controllers.gateway.ClaimAuthController.confirm(empref:String, clientId:String, redirectUri :String)
-GET         /gateway/deny                           controllers.gateway.ClaimAuthController.deny(redirectUri :String)
+GET         /oauth/confirm                          controllers.gateway.ClaimAuthController.confirm(empref:String, clientId:String, redirectURI :String)
+GET         /oauth/deny                             controllers.gateway.ClaimAuthController.deny(redirectURI :String)

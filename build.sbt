@@ -8,6 +8,8 @@ routesImport += "uk.gov.hmrc.domain._, models.PlayBindings._"
 
 scalaVersion := "2.11.8"
 
+PlayKeys.playDefaultPort := 9002
+
 libraryDependencies ++= Seq(
   cache,
   ws,

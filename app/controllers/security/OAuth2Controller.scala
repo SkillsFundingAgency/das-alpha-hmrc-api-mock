@@ -2,7 +2,7 @@ package controllers.security
 
 import javax.inject.{Singleton, Inject}
 
-import auth.DASDataHandler
+import auth.APIDataHandler
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext
@@ -18,7 +18,7 @@ trait MyOAuth extends OAuth2Provider {
 }
 
 @Singleton
-class OAuth2Controller @Inject()(dataHandler: DASDataHandler)(implicit exec: ExecutionContext) extends Controller with MyOAuth {
+class OAuth2Controller @Inject()(dataHandler: APIDataHandler)(implicit exec: ExecutionContext) extends Controller with MyOAuth {
   def accessToken = Action.async { implicit request =>
     issueAccessToken(dataHandler)
   }

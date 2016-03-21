@@ -34,7 +34,7 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
           case Some(user) =>
             request.session.get("uri") match {
               case Some(uri) => Redirect(uri).removingFromSession("uri").addingToSession((UserAction.sessionKey, user.id.toString))
-              case None => Redirect(controllers.client.routes.ClientController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
+              case None => Redirect(controllers.gateway.routes.ApplicationController.index()).addingToSession(UserAction.sessionKey -> user.id.toString)
             }
           case None => Ok(views.html.gateway.login(userForm.withError("username", "Bad user name or password")))
         }
@@ -43,6 +43,6 @@ class GatewayLoginController @Inject()(gatewayUserDAO: GatewayUserDAO, UserActio
   }
 
   def logout = Action {
-    Redirect(controllers.client.routes.ClientLoginController.showLogin()).withNewSession
+    Redirect(controllers.gateway.routes.GatewayLoginController.showLogin()).withNewSession
   }
 }

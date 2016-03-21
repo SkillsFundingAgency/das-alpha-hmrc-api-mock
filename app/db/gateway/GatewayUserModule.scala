@@ -1,6 +1,6 @@
 package db.gateway
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
@@ -39,4 +39,5 @@ trait GatewayUserModule extends DBModule {
 
 }
 
+@Singleton
 class GatewayUserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends GatewayUserModule
