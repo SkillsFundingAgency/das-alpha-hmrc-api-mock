@@ -16,8 +16,8 @@ GET         /epaye/*empref/levy-declarations        controllers.api.EpayeControl
 GET         /epaye                                  controllers.api.EpayeController.root
 
 
-POST        /oauth2/access_token                    controllers.security.OAuth2Controller.accessToken
-GET         /oauth/authorize                        controllers.gateway.ClaimAuthController.auth(empref:String, clientId:String, redirectURI :String)
+POST        /oauth/token                            controllers.security.OAuth2Controller.accessToken
+GET         /oauth/authorize                        controllers.gateway.ClaimAuthController.auth(scope:String, clientId:String, redirectURI :String)
 
-GET         /oauth/confirm                          controllers.gateway.ClaimAuthController.confirm(empref:String, clientId:String, redirectURI :String)
+GET         /oauth/confirm                          controllers.gateway.ClaimAuthController.confirm(scope:String, clientId:String, redirectURI :String)
 GET         /oauth/deny                             controllers.gateway.ClaimAuthController.deny(redirectURI :String)

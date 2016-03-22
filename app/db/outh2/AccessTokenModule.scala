@@ -10,11 +10,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class AccessTokenRow(
                            accessToken: String,
-                           refreshToken: Option[String],
-                           userId: Long, scope: Option[String],
-                           expiresIn: Option[Long],
-                           createdAt: Date,
-                           clientId: Option[String])
+                           scope: String,
+                           expiresAt: Date,
+                           createdAt: Date
+                         )
 
 trait AccessTokenModule extends DBModule {
 
@@ -26,13 +25,13 @@ trait AccessTokenModule extends DBModule {
 
   def all(): Future[Seq[AccessTokenRow]] = db.run(AccessTokens.result)
 
-  def find(userId:Long, clientId:Option[String]):Future[Option[AccessTokenRow]] = db.run {
-    AccessTokens.filter(at => at.userId === userId && at.clientId == clientId).result.headOption
+  def find(accessToken: String): Future[Option[AccessTokenRow]] = db.run {
+    AccessTokens.filter(_.accessToken === accessToken).result.headOption
   }
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
-      _ <- AccessTokens.filter(a => a.clientId === token.clientId && a.userId === token.userId).delete
+      _ <- AccessTokens.filter(a => a.accessToken === token.accessToken).delete
       a <- AccessTokens += token
     } yield a.result
   }
@@ -40,19 +39,13 @@ trait AccessTokenModule extends DBModule {
   class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "ACCESS_TOKEN") {
     def accessToken = column[String]("ACCESS_TOKEN", O.PrimaryKey)
 
-    def refreshToken = column[Option[String]]("REFRESH_TOKEN")
+    def scope = column[String]("SCOPE")
 
-    def userId = column[Long]("DAS_USER_ID")
-
-    def scope = column[Option[String]]("SCOPE")
-
-    def expiresIn = column[Option[Long]]("EXPIRES_IN")
+    def expiresAt = column[Date]("EXPIRES_AT")
 
     def createdAt = column[Date]("CREATED_AT")
 
-    def clientId = column[Option[String]]("CLIENT_ID")
-
-    def * = (accessToken, refreshToken, userId, scope, expiresIn, createdAt, clientId) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
+    def * = (accessToken, scope, expiresAt, createdAt) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 
   }
 
