@@ -3,7 +3,7 @@ package actions.api
 import javax.inject.Singleton
 
 import com.google.inject.Inject
-import db.outh2.AccessTokenModule
+import db.outh2.AccessTokenDAO
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc._
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ApiRequest[A](val request: Request[A], val emprefs: List[String]) extends WrappedRequest[A](request)
 
 @Singleton
-class ApiAction @Inject()(accessTokens: AccessTokenModule)(implicit ec: ExecutionContext)
+class ApiAction @Inject()(accessTokens: AccessTokenDAO)(implicit ec: ExecutionContext)
   extends ActionBuilder[ApiRequest]
     with ActionRefiner[Request, ApiRequest] {
 

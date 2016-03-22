@@ -3,21 +3,11 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
+GET        /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /                                       controllers.gateway.ApplicationController.index
-
-GET         /gateway/login                          controllers.gateway.GatewayLoginController.showLogin
-POST        /gateway/login                          controllers.gateway.GatewayLoginController.handleLogin
-GET         /gateway/logout                         controllers.gateway.GatewayLoginController.logout
 
 # Routes for the API
-GET         /epaye/*empref/levy-declarations        controllers.api.EpayeController.levyDeclarations(empref :EmpRef)
-GET         /epaye                                  controllers.api.EpayeController.root
+GET        /epaye/*empref/levy-declarations        controllers.api.EpayeController.levyDeclarations(empref :EmpRef)
+GET        /epaye                                  controllers.api.EpayeController.root
 
-
-POST        /oauth/token                            controllers.security.OAuth2Controller.accessToken
-GET         /oauth/authorize                        controllers.gateway.ClaimAuthController.auth(scope:String, clientId:String, redirectURI :String)
-
-GET         /oauth/confirm                          controllers.gateway.ClaimAuthController.confirm(scope:String, clientId:String, redirectURI :String)
-GET         /oauth/deny                             controllers.gateway.ClaimAuthController.deny(redirectURI :String)
+PUT        /epaye/provide-token                        controllers.api.AccessTokenController.provideToken
