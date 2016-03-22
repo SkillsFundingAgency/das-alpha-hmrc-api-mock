@@ -1,0 +1,23 @@
+@import db.outh2.AccessTokenRow
+@(rows:Seq[AccessTokenRow])
+
+@main("Access tokens") {
+    <table>
+        <thead>
+            <tr>
+                <th>Token</th>
+                <th>Scope</th>
+                <th>Expires At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @rows.map { row =>
+              <tr>
+                  <td>@row.accessToken</td>
+                  <td>@row.scope</td>
+                  <td>@row.expiresAt</td>
+              </tr>
+            }
+        </tbody>
+    </table>
+}

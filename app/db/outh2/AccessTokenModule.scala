@@ -31,7 +31,7 @@ trait AccessTokenModule extends DBModule {
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
-      _ <- AccessTokens.filter(a => a.accessToken === token.accessToken).delete
+      _ <- AccessTokens.filter(a => a.scope === token.scope).delete
       a <- AccessTokens += token
     } yield a.result
   }
