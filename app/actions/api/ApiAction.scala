@@ -4,6 +4,7 @@ import javax.inject.Singleton
 
 import com.google.inject.Inject
 import db.outh2.AccessTokenDAO
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc._
@@ -24,7 +25,9 @@ class ApiAction @Inject()(accessTokens: AccessTokenDAO)(implicit ec: ExecutionCo
     val BearerToken = "Bearer (.+)".r
     request.headers.get("Authorization") match {
       case Some(BearerToken(accessToken)) => accessTokens.find(accessToken).map {
-        case Some(at) => Right(new ApiRequest(request, Json.parse(at.scope).validate[List[String]].get))
+        case Some(at) =>
+          Logger.info(s"Found access token with scope ${at.scope}")
+          Right(new ApiRequest(request, List(at.scope)))
         case _ => Left(Unauthorized)
       }
       case _ => Future.successful(Left(Unauthorized))
