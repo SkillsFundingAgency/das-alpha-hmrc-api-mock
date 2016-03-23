@@ -36,14 +36,14 @@ trait AccessTokenModule extends DBModule {
     } yield a.result
   }
 
-  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "ACCESS_TOKEN") {
-    def accessToken = column[String]("ACCESS_TOKEN", O.PrimaryKey)
+  class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "access_token") {
+    def accessToken = column[String]("access_token", O.PrimaryKey)
 
-    def scope = column[String]("SCOPE")
+    def scope = column[String]("scope")
 
-    def expiresAt = column[Date]("EXPIRES_AT")
+    def expiresAt = column[Date]("expires_at")
 
-    def createdAt = column[Date]("CREATED_AT")
+    def createdAt = column[Date]("created_at")
 
     def * = (accessToken, scope, expiresAt, createdAt) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 

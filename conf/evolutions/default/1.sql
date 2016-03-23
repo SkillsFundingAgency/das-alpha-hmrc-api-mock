@@ -1,28 +1,37 @@
 # --- !Ups
 
-create table SCHEME (
-    EMPREF VARCHAR NOT NULL PRIMARY KEY,
-    TERMINATION_DATE DATE NULL
+create table "scheme" (
+    "empref" VARCHAR NOT NULL PRIMARY KEY,
+    "termination_date" DATE NULL
 );
 
-CREATE TABLE LEVY_DECLARATION(
-  YEAR INTEGER NOT NULL,
-  MONTH INTEGER NOT NULL,
-  AMOUNT NUMERIC NOT NULL,
-  EMPREF VARCHAR NOT NULL,
-  PRIMARY KEY (YEAR, MONTH, EMPREF),
-  FOREIGN KEY (EMPREF) REFERENCES SCHEME(EMPREF)
+INSERT INTO "scheme" ("empref") VALUES ('123/AB12345');
+INSERT INTO "scheme" ("empref") VALUES ('123/BC12345');
+INSERT INTO "scheme" ("empref") VALUES ('321/ZX54321');
+INSERT INTO "scheme" ("empref") VALUES ('222/MM22222');
+
+CREATE TABLE "levy_declaration"(
+  "year" INTEGER NOT NULL,
+  "month" INTEGER NOT NULL,
+  "amount" NUMERIC NOT NULL,
+  "empref" VARCHAR NOT NULL,
+  PRIMARY KEY ("year", "month", "empref"),
+  FOREIGN KEY ("empref") REFERENCES "scheme"
 );
 
-CREATE TABLE ACCESS_TOKEN(
-  ACCESS_TOKEN VARCHAR NOT NULL PRIMARY KEY,
-  SCOPE VARCHAR NOT NULL,
-  EXPIRES_AT DATE NOT NULL,
-  CREATED_AT DATE NOT NULL
+CREATE TABLE "access_token" (
+  "access_token" VARCHAR NOT NULL PRIMARY KEY,
+  "scope" VARCHAR NOT NULL,
+  "expires_at" DATE NOT NULL,
+  "created_at" DATE NOT NULL
 );
+
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 2, 1000, '123/AB12345');
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 1, 500, '123/AB12345');
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2015, 12, 600, '123/AB12345');
 
 # --- !Downs
 
-DROP TABLE LEVY_DECLARATION;
-DROP TABLE SCHEME;
-DROP TABLE ACCESS_TOKEN;
+DROP TABLE "levy_declaration";
+DROP TABLE "scheme";
+DROP TABLE "access_token";
