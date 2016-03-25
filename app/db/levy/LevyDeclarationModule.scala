@@ -20,14 +20,14 @@ trait LevyDeclarationModule extends DBModule {
 
   def insert(cat: LevyDeclarationRow): Future[Unit] = db.run(LevyDeclarations += cat).map { _ => () }
 
-  class LevyDeclarationTable(tag: Tag) extends Table[LevyDeclarationRow](tag, "LEVY_DECLARATION") {
-    def year = column[Int]("YEAR")
+  class LevyDeclarationTable(tag: Tag) extends Table[LevyDeclarationRow](tag, "levy_declaration") {
+    def year = column[Int]("year")
 
-    def month = column[Int]("MONTH")
+    def month = column[Int]("month")
 
-    def amount = column[BigDecimal]("AMOUNT")
+    def amount = column[BigDecimal]("amount")
 
-    def empref = column[String]("EMPREF")
+    def empref = column[String]("empref")
 
     def pk = primaryKey("levy_decl_pk", (year, month, empref))
 
