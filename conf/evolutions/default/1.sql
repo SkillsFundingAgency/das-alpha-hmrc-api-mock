@@ -2,7 +2,7 @@
 
 create table "scheme" (
     "empref" VARCHAR NOT NULL PRIMARY KEY,
-    "termination_date" DATE NULL
+    "termination_date" BIGINT NULL
 );
 
 INSERT INTO "scheme" ("empref") VALUES ('123/AB12345');
@@ -19,11 +19,12 @@ CREATE TABLE "levy_declaration"(
   FOREIGN KEY ("empref") REFERENCES "scheme"
 );
 
+-- noinspection SqlNoDataSourceInspection
 CREATE TABLE "access_token" (
   "access_token" VARCHAR NOT NULL PRIMARY KEY,
   "scope" VARCHAR NOT NULL,
-  "expires_at" DATE NOT NULL,
-  "created_at" DATE NOT NULL
+  "expires_at" BIGINT NOT NULL,
+  "created_at" BIGINT NOT NULL
 );
 
 INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 2, 1000, '123/AB12345');
