@@ -12,13 +12,14 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AccessTokenController @Inject()(accessTokens: AccessTokenDAO)(implicit ec: ExecutionContext) extends Controller {
 
-  case class Token(value: String, scope: String, expiresAt: Long)
+  case class Token(value: String, scope: String, clientId: String, expiresAt: Long)
+
   implicit val tokenFormat = Json.format[Token]
 
   def provideToken = Action.async(parse.json) { implicit request =>
     request.body.validate[Token] match {
       case JsSuccess(token, _) =>
-        val at = AccessTokenRow(token.value, token.scope, token.expiresAt, System.currentTimeMillis())
+        val at = AccessTokenRow(token.value, token.scope, token.clientId, token.expiresAt, System.currentTimeMillis())
         Logger.info(s"new token received for scope ${token.scope}")
         accessTokens.deleteExistingAndCreate(at).map(_ => NoContent)
 

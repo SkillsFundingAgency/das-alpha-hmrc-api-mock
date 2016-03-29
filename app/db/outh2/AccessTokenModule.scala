@@ -11,6 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class AccessTokenRow(
                            accessToken: String,
                            scope: String,
+                           clientId: String,
                            expiresAt: Long,
                            createdAt: Long
                          )
@@ -37,15 +38,19 @@ trait AccessTokenModule extends DBModule {
   }
 
   class AccessTokenTable(tag: Tag) extends Table[AccessTokenRow](tag, "access_token") {
-    def accessToken = column[String]("access_token", O.PrimaryKey)
+    def clientId = column[String]("client_id")
 
     def scope = column[String]("scope")
+
+    def pk = primaryKey("access_token_pk", (clientId, scope))
+
+    def accessToken = column[String]("access_token")
 
     def expiresAt = column[Long]("expires_at")
 
     def createdAt = column[Long]("created_at")
 
-    def * = (accessToken, scope, expiresAt, createdAt) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
+    def * = (accessToken, scope, clientId, expiresAt, createdAt) <>(AccessTokenRow.tupled, AccessTokenRow.unapply)
 
   }
 
