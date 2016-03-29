@@ -12,9 +12,6 @@ import scala.concurrent.ExecutionContext
 class UIController @Inject()(accessTokens: AccessTokenDAO)(implicit ec: ExecutionContext) extends Controller {
 
   def index = Action.async { implicit request =>
-    Logger.info(System.getenv("JDBC_DATABASE_URL"))
-    Logger.info(System.getenv("JDBC_DATABASE_USERNAME"))
-    Logger.info(System.getenv("JDBC_DATABASE_PASSWORD"))
     accessTokens.all().map(rows => Ok(views.html.index(rows)))
   }
 
