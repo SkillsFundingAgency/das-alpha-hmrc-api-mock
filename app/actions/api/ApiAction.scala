@@ -28,9 +28,13 @@ class ApiAction @Inject()(accessTokens: AccessTokenDAO)(implicit ec: ExecutionCo
         case Some(at) =>
           Logger.info(s"Found access token with scope ${at.scope}")
           Right(new ApiRequest(request, List(at.scope)))
-        case _ => Left(Unauthorized)
+        case _ =>
+          Logger.info(s"No authorization found for Bearer $accessToken")
+          Left(Unauthorized(s"No authorization found for Bearer $accessToken"))
       }
-      case _ => Future.successful(Left(Unauthorized))
+      case _ =>
+        Logger.info("No Authorization header found")
+        Future.successful(Left(Unauthorized("No Authorization header found")))
     }
   }
 }
