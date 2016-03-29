@@ -1,23 +1,42 @@
 @import db.outh2.AccessTokenRow
-@(rows:Seq[AccessTokenRow])
+@(rows: Seq[AccessTokenRow])
 
-@main("Access tokens") {
-    <table>
-        <thead>
-            <tr>
-                <th>Token</th>
-                <th>Scope</th>
-                <th>Expires At</th>
-            </tr>
-        </thead>
-        <tbody>
+    @main("Access tokens") {
+        <table>
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Scope</th>
+                    <th>Expires At</th>
+                </tr>
+            </thead>
+            <tbody>
             @rows.map { row =>
-              <tr>
-                  <td>@row.accessToken</td>
-                  <td>@row.scope</td>
-                  <td>@row.expiresAt</td>
-              </tr>
+                <tr>
+                    <td>@row.accessToken</td>
+                    <td>@row.scope</td>
+                    <td>@row.expiresAt</td>
+                </tr>
             }
-        </tbody>
-    </table>
-}
+            </tbody>
+        </table>
+        <div>
+            database info:
+            <table>
+                <tbody>
+                    <tr>
+                        <th>JDBC_DATABASE_URL</th>
+                        <td>@System.getenv("JDBC_DATABASE_URL")</td>
+                    </tr>
+                    <tr>
+                        <th>JDBC_DATABASE_USERNAME</th>
+                        <td>@System.getenv("JDBC_DATABASE_USERNAME")</td>
+                    </tr>
+                    <tr>
+                        <th>JDBC_DATABASE_PASSWORD</th>
+                        <td>@System.getenv("JDBC_DATABASE_PASSWORD")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
