@@ -5,6 +5,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Client ID</th>
                     <th>Token</th>
                     <th>Scope</th>
                     <th>Expires At</th>
@@ -13,6 +14,7 @@
             <tbody>
             @rows.map { row =>
                 <tr>
+                    <td>@row.clientId</td>
                     <td>@row.accessToken</td>
                     <td>@row.scope</td>
                     <td>@row.expiresAt</td>
