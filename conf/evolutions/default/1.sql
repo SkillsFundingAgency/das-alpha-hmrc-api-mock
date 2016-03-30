@@ -19,10 +19,16 @@ CREATE TABLE "levy_declaration" (
   FOREIGN KEY ("empref") REFERENCES "scheme"
 );
 
--- noinspection SqlNoDataSourceInspection
+CREATE TABLE "gateway_id_scheme" (
+  "id"     VARCHAR NOT NULL,
+  "empref" VARCHAR NOT NULL REFERENCES "scheme",
+  PRIMARY KEY ("id", "empref")
+);
+
 CREATE TABLE "access_token" (
   "client_id"    VARCHAR NOT NULL,
   "scope"        VARCHAR NOT NULL,
+  "gateway_id"   VARCHAR NOT NULL,
   "access_token" VARCHAR NOT NULL,
   "expires_at"   BIGINT  NOT NULL,
   "created_at"   BIGINT  NOT NULL,
@@ -35,6 +41,7 @@ INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (201
 
 # --- !Downs
 
+DROP TABLE "gateway_id_scheme";
 DROP TABLE "levy_declaration";
 DROP TABLE "scheme";
 DROP TABLE "access_token";
