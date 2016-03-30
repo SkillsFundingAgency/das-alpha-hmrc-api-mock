@@ -1,9 +1,10 @@
 package db.outh2
 
-import java.sql.Date
 import javax.inject.{Inject, Singleton}
 
 import db.DBModule
+import org.joda.time._
+import org.joda.time.format._
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +15,9 @@ case class AccessTokenRow(
                            clientId: String,
                            expiresAt: Long,
                            createdAt: Long
-                         )
+                         ) {
+  val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
+}
 
 trait AccessTokenModule extends DBModule {
 
