@@ -3,6 +3,7 @@ package db.levy
 import javax.inject.Inject
 
 import db.DBModule
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,9 @@ class GatewayIdSchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   def bindEmprefs(gatewayId: String, emprefs: List[String]): Future[Unit] =
     emprefsForId(gatewayId).flatMap { existingEmprefs =>
+      Logger.info(s"exiting emprefs for $gatewayId: $existingEmprefs")
       val toInsert = emprefs.filter(e => !existingEmprefs.contains(e)).map(e => GatewayIdSchemeRow(gatewayId, e))
+      Logger.info(s"to insert: $toInsert")
       db.run(GatewayIdSchemes ++= toInsert)
     }.map(_ => ())
 

@@ -20,13 +20,16 @@ CREATE TABLE "access_token" (
   "gateway_id"   VARCHAR NOT NULL,
   "access_token" VARCHAR NOT NULL,
   "expires_at"   BIGINT  NOT NULL,
-  "created_at"   BIGINT  NOT NULL,
-  PRIMARY KEY ("client_id", "scope")
+  "created_at"   BIGINT  NOT NULL
 );
 
 INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 2, 1000, '123/AB12345');
 INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 1, 500, '123/AB12345');
 INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2015, 12, 600, '123/AB12345');
+
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 2, 750, '123/BC12345');
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2016, 1, 900, '123/BC12345');
+INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (2015, 12, 125, '123/BC12345');
 
 # --- !Downs
 

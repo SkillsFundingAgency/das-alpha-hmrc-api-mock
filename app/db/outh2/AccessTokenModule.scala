@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class AccessTokenRow(
                            accessToken: String,
                            scope: String,
-                           gatewayId:String,
+                           gatewayId: String,
                            clientId: String,
                            expiresAt: Long,
                            createdAt: Long
@@ -55,6 +55,10 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def find(accessToken: String): Future[Option[AccessTokenRow]] = db.run {
     AccessTokens.filter(_.accessToken === accessToken).result.headOption
   }
+
+  def create(token: AccessTokenRow): Future[Unit] = db.run {
+    AccessTokens += token
+  }.map(_ => ())
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
