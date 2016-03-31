@@ -3,7 +3,7 @@ package controllers.api
 import javax.inject._
 
 import actions.api.ApiAction
-import db.levy.{LevyDeclarationDAO, SchemeDAO}
+import db.levy.LevyDeclarationDAO
 import models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
 import org.joda.time.LocalDate
 import play.api.Logger
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class EpayeController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDeclarationDAO, ApiAction: ApiAction)(implicit exec: ExecutionContext) extends Controller {
+class EpayeController @Inject()(levyDeclarationDAO: LevyDeclarationDAO, ApiAction: ApiAction)(implicit exec: ExecutionContext) extends Controller {
   def levyDeclarations(empref: EmpRef) = ApiAction.async { implicit request =>
     if (request.emprefs.contains(empref.value)) {
       levyDeclarationDAO.byEmpref(empref.value).map { ds =>
@@ -31,6 +31,4 @@ class EpayeController @Inject()(schemeDAO: SchemeDAO, levyDeclarationDAO: LevyDe
       Future.successful(Unauthorized)
     }
   }
-
-  def root = Action.async { _ => ??? }
 }

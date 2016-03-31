@@ -3,7 +3,7 @@ package actions.api
 import javax.inject.Singleton
 
 import com.google.inject.Inject
-import db.levy.GatewayIdDAO
+import db.levy.GatewayIdSchemeDAO
 import db.outh2.AccessTokenDAO
 import play.api.Logger
 import play.api.mvc.Results._
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ApiRequest[A](val request: Request[A], val emprefs: List[String]) extends WrappedRequest[A](request)
 
 @Singleton
-class ApiAction @Inject()(accessTokens: AccessTokenDAO, enrolments: GatewayIdDAO)(implicit ec: ExecutionContext)
+class ApiAction @Inject()(accessTokens: AccessTokenDAO, enrolments: GatewayIdSchemeDAO)(implicit ec: ExecutionContext)
   extends ActionBuilder[ApiRequest]
     with ActionRefiner[Request, ApiRequest] {
 

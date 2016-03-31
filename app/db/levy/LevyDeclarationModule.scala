@@ -10,7 +10,6 @@ import scala.concurrent.{ExecutionContext, Future}
 case class LevyDeclarationRow(year: Int, month: Int, amount: BigDecimal, empref: String)
 
 trait LevyDeclarationModule extends DBModule {
-  self: SchemeModule =>
 
   import driver.api._
 
@@ -31,7 +30,6 @@ trait LevyDeclarationModule extends DBModule {
 
     def pk = primaryKey("levy_decl_pk", (year, month, empref))
 
-    def schemeFK = foreignKey("decl_scheme_fk", empref, Schemes)(_.empref, onDelete = ForeignKeyAction.Cascade)
 
     def * = (year, month, amount, empref) <>(LevyDeclarationRow.tupled, LevyDeclarationRow.unapply)
   }
@@ -41,4 +39,3 @@ trait LevyDeclarationModule extends DBModule {
 @Singleton
 class LevyDeclarationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
   extends LevyDeclarationModule
-    with SchemeModule

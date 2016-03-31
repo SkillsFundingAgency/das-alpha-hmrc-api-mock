@@ -2,7 +2,7 @@ package controllers.api
 
 import javax.inject.{Inject, Singleton}
 
-import db.levy.GatewayIdDAO
+import db.levy.GatewayIdSchemeDAO
 import db.outh2.{AccessTokenDAO, AccessTokenRow}
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -11,7 +11,7 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AccessTokenController @Inject()(accessTokens: AccessTokenDAO, enrolments: GatewayIdDAO)(implicit ec: ExecutionContext) extends Controller {
+class AccessTokenController @Inject()(accessTokens: AccessTokenDAO, enrolments: GatewayIdSchemeDAO)(implicit ec: ExecutionContext) extends Controller {
 
   case class Token(value: String, scope: String, gatewayId: String, emprefs: List[String], clientId: String, expiresAt: Long)
 
