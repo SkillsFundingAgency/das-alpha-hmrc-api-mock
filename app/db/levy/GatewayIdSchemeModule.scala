@@ -3,7 +3,6 @@ package db.levy
 import javax.inject.Inject
 
 import db.DBModule
-import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,16 +31,16 @@ class GatewayIdSchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   import driver.api._
 
-  def emprefsForId(gatewayId: String): Future[Seq[String]] = db.run {
-    GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result
-  }
+  def emprefsForId(gatewayId: String): Future[Seq[String]] = db.run(GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result)
 
-  def bindEmprefs(gatewayId: String, emprefs: List[String]): Future[Unit] =
-    emprefsForId(gatewayId).flatMap { existingEmprefs =>
-      Logger.info(s"exiting emprefs for $gatewayId: $existingEmprefs")
-      val toInsert = emprefs.filter(e => !existingEmprefs.contains(e)).map(e => GatewayIdSchemeRow(gatewayId, e))
-      Logger.info(s"to insert: $toInsert")
-      db.run(GatewayIdSchemes ++= toInsert)
-    }.map(_ => ())
+  /**
+    * Replace existing list of emprefs held for the gatewayId with the new list
+    */
+  def bindEmprefs(gatewayId: String, emprefs: List[String]): Future[Unit] = run {
+    for {
+      _ <- GatewayIdSchemes.filter(_.id === gatewayId).delete
+      _ <- GatewayIdSchemes ++= emprefs.map(e => GatewayIdSchemeRow(gatewayId, e))
+    } yield ()
+  }
 
 }

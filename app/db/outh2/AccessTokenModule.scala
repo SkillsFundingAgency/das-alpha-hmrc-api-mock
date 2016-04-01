@@ -2,10 +2,10 @@ package db.outh2
 
 import javax.inject.{Inject, Singleton}
 
-import cats.std.unit
 import db.DBModule
 import org.joda.time.format._
 import play.api.db.slick.DatabaseConfigProvider
+import slick.dbio.Effect.Write
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,17 +51,19 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 
   import driver.api._
 
-  def all(): Future[Seq[AccessTokenRow]] = db.run(AccessTokens.result)
+  def all(): Future[Seq[AccessTokenRow]] = run(AccessTokens.result)
 
-  def find(accessToken: String): Future[Option[AccessTokenRow]] = db.run {
-    AccessTokens.filter(_.accessToken === accessToken).result.headOption
-  }
+  def find(accessToken: String): Future[Option[AccessTokenRow]] = run(AccessTokens.filter(_.accessToken === accessToken).result.headOption)
 
-  def cleanup(): Future[Unit] = db.run(AccessTokens.filter(_.expiresAt < System.currentTimeMillis()).delete).map(_ => ())
+  val deleteExpired: DBIOAction[Int, NoStream, Write] = AccessTokens.filter(_.expiresAt < System.currentTimeMillis()).delete
 
-  def create(token: AccessTokenRow): Future[Unit] = db.run(AccessTokens += token).map(_ => ())
+  def cleanup(): Future[Unit] = run(deleteExpired).map(_ => ())
 
-  def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
+  def create(token: AccessTokenRow): Future[Unit] = run(AccessTokens += token).map(_ => ())
+
+  def clearExpired(): Future[Unit] = run(deleteExpired).map(_ => ())
+
+  def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = run {
     for {
       _ <- AccessTokens.filter(a => a.scope === token.scope).delete
       a <- AccessTokens += token

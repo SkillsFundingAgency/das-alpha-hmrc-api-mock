@@ -25,7 +25,6 @@ class ApiAction @Inject()(accessTokens: AccessTokenDAO, enrolments: GatewayIdSch
     request.headers.get("Authorization") match {
       case Some(BearerToken(accessToken)) => accessTokens.find(accessToken).flatMap {
         case Some(at) =>
-          Logger.info(s"Found access token for gateway id ${at.gatewayId}")
           enrolments.emprefsForId(at.gatewayId).map { emprefs =>
             Right(new ApiRequest(request, emprefs.toList))
           }
