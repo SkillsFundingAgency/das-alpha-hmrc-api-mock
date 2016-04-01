@@ -23,6 +23,7 @@ class AccessTokenController @Inject()(accessTokens: AccessTokenDAO, enrolments: 
         val at = AccessTokenRow(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
         Logger.info(s"new token received for scope ${token.scope}")
         for {
+          _ <- accessTokens.cleanup()
           _ <- accessTokens.create(at)
           _ <- enrolments.bindEmprefs(token.gatewayId, token.emprefs)
         } yield NoContent

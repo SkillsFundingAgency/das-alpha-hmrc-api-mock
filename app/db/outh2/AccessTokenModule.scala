@@ -2,6 +2,7 @@ package db.outh2
 
 import javax.inject.{Inject, Singleton}
 
+import cats.std.unit
 import db.DBModule
 import org.joda.time.format._
 import play.api.db.slick.DatabaseConfigProvider
@@ -56,9 +57,9 @@ class AccessTokenDAO @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     AccessTokens.filter(_.accessToken === accessToken).result.headOption
   }
 
-  def create(token: AccessTokenRow): Future[Unit] = db.run {
-    AccessTokens += token
-  }.map(_ => ())
+  def cleanup(): Future[Unit] = db.run(AccessTokens.filter(_.expiresAt < System.currentTimeMillis()).delete).map(_ => ())
+
+  def create(token: AccessTokenRow): Future[Unit] = db.run(AccessTokens += token).map(_ => ())
 
   def deleteExistingAndCreate(token: AccessTokenRow): Future[Unit] = db.run {
     for {
