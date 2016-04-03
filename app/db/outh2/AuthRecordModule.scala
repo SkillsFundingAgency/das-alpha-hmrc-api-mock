@@ -1,6 +1,6 @@
 package db.outh2
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
 import db.DBModule

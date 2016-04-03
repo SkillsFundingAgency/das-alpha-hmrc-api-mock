@@ -14,13 +14,15 @@ class ApiAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchem
   extends ActionBuilder[ApiRequest]
     with ActionRefiner[Request, ApiRequest] {
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, ApiRequest[A]]] = {
+  private def unauthorized(message: String): Future[Left[Result, Nothing]] = Future.successful(Left(Unauthorized(message)))
+
+  override protected[api] def refine[A](request: Request[A]): Future[Either[Result, ApiRequest[A]]] = {
     val BearerToken = "Bearer (.+)".r
 
     request.headers.get("Authorization") match {
       case Some(BearerToken(accessToken)) => validateToken(accessToken).map {
-        _.left.map(Unauthorized(_))
-          .right.map(new ApiRequest(request, _))
+        case Right(emprefs) => Right(new ApiRequest[A](request, emprefs))
+        case Left(message) => Left(Unauthorized(message))
       }
       case Some(h) => unauthorized("Authorization header should be a Bearer token")
       case None => unauthorized("No Authorization header found")
@@ -33,6 +35,4 @@ class ApiAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchem
       case _ => Future.successful(Left(s"No authorization found for Bearer $accessToken"))
     }
   }
-
-  def unauthorized(message: String): Future[Left[Result, Nothing]] = Future.successful(Left(Unauthorized(message)))
 }
