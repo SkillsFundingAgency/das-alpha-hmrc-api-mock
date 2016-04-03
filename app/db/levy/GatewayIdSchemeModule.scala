@@ -2,6 +2,7 @@ package db.levy
 
 import javax.inject.Inject
 
+import com.google.inject.ImplementedBy
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -27,7 +28,15 @@ trait GatewayIdSchemeModule extends DBModule {
 
 }
 
-class GatewayIdSchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends GatewayIdSchemeModule {
+@ImplementedBy(classOf[GatewayIdSchemeDAO])
+trait GatewayIdSchemeOps {
+  def emprefsForId(gatewayId: String): Future[Seq[String]]
+
+  def bindEmprefs(gatewayId: String, emprefs: List[String]): Future[Unit]
+}
+
+class GatewayIdSchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
+  extends GatewayIdSchemeModule with GatewayIdSchemeOps {
 
   import driver.api._
 

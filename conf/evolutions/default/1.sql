@@ -14,10 +14,10 @@ CREATE TABLE "gateway_id_scheme" (
   PRIMARY KEY ("id", "empref")
 );
 
-CREATE TABLE "access_token" (
+CREATE TABLE "auth_record" (
   "client_id"    VARCHAR NOT NULL,
-  "scope"        VARCHAR NOT NULL,
   "gateway_id"   VARCHAR NOT NULL,
+  "scope"        VARCHAR NOT NULL,
   "access_token" VARCHAR NOT NULL,
   "expires_at"   BIGINT  NOT NULL,
   "created_at"   BIGINT  NOT NULL
@@ -35,4 +35,4 @@ INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (201
 
 DROP TABLE "gateway_id_scheme";
 DROP TABLE "levy_declaration";
-DROP TABLE "access_token";
+DROP TABLE "auth_record";
