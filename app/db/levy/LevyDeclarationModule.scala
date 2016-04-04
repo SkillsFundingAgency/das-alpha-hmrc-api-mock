@@ -2,6 +2,7 @@ package db.levy
 
 import javax.inject.{Inject, Singleton}
 
+import com.google.inject.ImplementedBy
 import db.DBModule
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -32,6 +33,7 @@ trait LevyDeclarationModule extends DBModule {
 
 }
 
+@ImplementedBy(classOf[LevyDeclarationDAO])
 trait LevyDeclarationOps {
   def byEmpref(empref: String): Future[Seq[LevyDeclarationRow]]
 
