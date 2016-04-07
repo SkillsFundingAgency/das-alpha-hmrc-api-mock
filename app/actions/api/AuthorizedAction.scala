@@ -8,9 +8,9 @@ import play.api.mvc.{ActionBuilder, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedRequest[A](val request: Request[A], val emprefs: List[String]) extends WrappedRequest[A](request)
+class AuthorizedRequest[A](val request: Request[A], val emprefs: List[String]) extends WrappedRequest[A](request)
 
-class AuthenticatedActionBuilder(taxId: String, scope: String, authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext)
+class AuthorizedActionBuilder(taxId: String, scope: String, authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext)
   extends ActionBuilder[Request] {
   override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
     val BearerToken = "Bearer (.+)".r
@@ -32,8 +32,7 @@ class AuthenticatedActionBuilder(taxId: String, scope: String, authRecords: Auth
 }
 
 
-class AuthenticatedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext) {
-
-  def apply[A](taxId: String, scope: String): ActionBuilder[Request] = new AuthenticatedActionBuilder(taxId, scope, authRecords, enrolments)(ec)
-
+class AuthorizedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext) {
+  def apply[A](taxId: String, scope: String): ActionBuilder[Request] =
+    new AuthorizedActionBuilder(taxId, scope, authRecords, enrolments)(ec)
 }
