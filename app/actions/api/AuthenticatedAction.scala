@@ -17,21 +17,16 @@ class AuthenticatedActionBuilder(taxId: String, scope: String, authRecords: Auth
 
     request.headers.get("Authorization") match {
       case Some(BearerToken(accessToken)) => validateToken(accessToken, taxId, scope).flatMap {
-        case Right(true) => block(request)
-        case Right(false) => unauthorized("Bearer token does not grant access to the requested resource")
-        case Left(message) => unauthorized(message)
+        case true => block(request)
+        case false => unauthorized("Bearer token does not grant access to the requested resource")
       }
       case Some(h) => unauthorized("Authorization header should be a Bearer token")
       case None => unauthorized("No Authorization header found")
     }
   }
 
-  def validateToken[A](accessToken: String, taxId: String, scope: String): Future[Either[String, Boolean]] = {
-    authRecords.find(accessToken, taxId, scope).flatMap {
-      case Some(at) => enrolments.emprefsForId(at.gatewayId).map(emprefs => Right(emprefs.contains(taxId)))
-      case _ => Future.successful(Left(s"No authorization found for Bearer $accessToken"))
-    }
-  }
+  def validateToken[A](accessToken: String, taxId: String, scope: String): Future[Boolean] =
+    authRecords.find(accessToken, taxId, scope).map(_.isDefined)
 
   private def unauthorized(message: String): Future[Result] = Future.successful(Unauthorized(message))
 }
