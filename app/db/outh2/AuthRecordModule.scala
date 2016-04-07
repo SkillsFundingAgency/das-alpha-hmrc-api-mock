@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
 import db.DBModule
+import db.levy.GatewayIdSchemeModule
 import org.joda.time.format._
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -50,13 +51,15 @@ trait AuthRecordOps {
 
   def find(accessToken: String): Future[Option[AuthRecordRow]]
 
+  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecordRow]]
+
   def clearExpired(): Future[Unit]
 
   def create(token: AuthRecordRow): Future[Unit]
 }
 
 class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends AuthRecordModule with AuthRecordOps {
+  extends AuthRecordModule with GatewayIdSchemeModule with AuthRecordOps {
 
   import driver.api._
 
@@ -70,6 +73,19 @@ class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProv
     * Find a row with the given access token that has not expired
     */
   def find(accessToken: String): Future[Option[AuthRecordRow]] = run(activeTokens.filter(t => t.accessToken === accessToken).result.headOption)
+
+  /**
+    * Find an AuthRecordRow matching the token and scope, and which allows access to a gateway id
+    * that has the taxId enrolled.
+    */
+  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecordRow]] = db.run {
+    val q = for {
+      t <- activeTokens if t.accessToken === accessToken && t.scope === scope
+      i <- GatewayIdSchemes if i.id === t.gatewayId && i.empref === taxId
+    } yield t
+
+    q.result.headOption
+  }
 
   def clearExpired(): Future[Unit] = run(expiredTokens.delete).map(_ => ())
 

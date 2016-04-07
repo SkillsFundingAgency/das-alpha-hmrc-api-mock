@@ -2,11 +2,10 @@ package controllers.api
 
 import javax.inject._
 
-import actions.api.ApiAction
+import actions.api.AuthenticatedAction
 import db.levy.LevyDeclarationOps
 import models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
 import org.joda.time.LocalDate
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.domain.EmpRef
@@ -14,15 +13,10 @@ import uk.gov.hmrc.domain.EmpRef
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EpayeController @Inject()(declarations: LevyDeclarationOps, ApiAction: ApiAction)(implicit exec: ExecutionContext) extends Controller {
+class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthenticatedAction: AuthenticatedAction)(implicit exec: ExecutionContext) extends Controller {
 
-  def levyDeclarations(empref: EmpRef, months: Option[Int]) = ApiAction.async { implicit request =>
-    if (request.emprefs.contains(empref.value)) {
-      listDeclarations(empref, months.getOrElse(36).min(36)).map(decls => Ok(Json.toJson(decls)))
-    } else {
-      Logger.warn(s"access token does not grant access to $empref")
-      Future.successful(Unauthorized(s"access token does not grant access to $empref"))
-    }
+  def levyDeclarations(empref: EmpRef, months: Option[Int]) = AuthenticatedAction(empref.value, "read:apprenticeship-levy").async { implicit request =>
+    listDeclarations(empref, months.getOrElse(36).min(36)).map(decls => Ok(Json.toJson(decls)))
   }
 
   /**
