@@ -85,6 +85,8 @@ object TestData {
     override def create(token: AuthRecordRow): Future[Unit] = Future.successful(())
 
     override def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecordRow]] = Future.successful(None)
+
+    override def expire(token: String): Future[Unit] = Future.successful(())
   }
 
   val enrolments = new GatewayIdSchemeOps {

@@ -10,6 +10,7 @@
                     <th>Scope</th>
                     <th>GGID</th>
                     <th>Expires At</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@
                     <td>@row.scope</td>
                     <td>@row.gatewayId</td>
                     <td>@row.expiresAtDateString</td>
+                    <td><a href="@controllers.api.routes.UIController.expireToken(row.accessToken)">expire</a></td>
                 </tr>
             }
             </tbody>

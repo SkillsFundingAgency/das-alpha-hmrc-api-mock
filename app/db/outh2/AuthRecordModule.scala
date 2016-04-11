@@ -6,6 +6,7 @@ import com.google.inject.ImplementedBy
 import db.DBModule
 import db.levy.GatewayIdSchemeModule
 import org.joda.time.format._
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,6 +57,8 @@ trait AuthRecordOps {
   def clearExpired(): Future[Unit]
 
   def create(token: AuthRecordRow): Future[Unit]
+
+  def expire(token: String): Future[Int]
 }
 
 class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
@@ -90,4 +93,12 @@ class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProv
   def clearExpired(): Future[Unit] = run(expiredTokens.delete).map(_ => ())
 
   def create(token: AuthRecordRow): Future[Unit] = run(AccessTokens += token).map(_ => ())
+
+  override def expire(token: String): Future[Int] = db.run {
+    val q = for {
+      t <- AccessTokens if t.accessToken === token
+    } yield t.expiresAt
+
+    q.update(System.currentTimeMillis())
+  }
 }
