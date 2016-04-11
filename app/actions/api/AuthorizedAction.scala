@@ -33,6 +33,6 @@ class AuthorizedActionBuilder(taxId: String, scope: String, authRecords: AuthRec
 
 
 class AuthorizedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext) {
-  def apply[A](taxId: String, scope: String): ActionBuilder[Request] =
+  def apply[A](taxId: String, scope: String): AuthorizedActionBuilder =
     new AuthorizedActionBuilder(taxId, scope, authRecords, enrolments)(ec)
 }
