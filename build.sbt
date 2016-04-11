@@ -1,14 +1,16 @@
 name := """das-alpha-hmrc-api-mock"""
 
-version := "1.0-SNAPSHOT"
-
 enablePlugins(PlayScala)
+enablePlugins(GitVersioning)
+enablePlugins(GitBranchPrompt)
+
+git.useGitDescribe := true
 
 routesImport += "uk.gov.hmrc.domain._, models.PlayBindings._"
 
 scalaVersion := "2.11.8"
 
-PlayKeys.devSettings := Seq("play.server.http.port" -> "9001")
+PlayKeys.devSettings := Seq("play.server.http.port" -> "9001"
 
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
