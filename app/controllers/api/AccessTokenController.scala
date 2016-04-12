@@ -17,25 +17,19 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: Ga
   implicit val tokenFormat = Json.format[Token]
 
   def provideToken = Action.async(parse.json) { implicit request =>
-    request.body.validate[Token] match {
-      case JsError(_) => Future.successful(BadRequest)
+    request.body.validate[Token].map { token =>
+      val at = AuthRecord(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
 
-      case JsSuccess(token, _) =>
-        val at = AuthRecord(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
+      // lear out any expired tokens in the background and ignore any db
+      // errors that might occur
+      authRecords.clearExpired().recover { case _ => () }
 
-        // lear out any expired tokens in the background and ignore any db conflicts that
-        // might occurs
-        authRecords.clearExpired().recover { case _ => () }
-
-        // Independent operations - run concurrently
-        val c = authRecords.create(at)
-        val e = enrolments.bindEmprefs(token.gatewayId, token.emprefs)
-
-        for {
-          _ <- c
-          _ <- e
-        } yield NoContent
-    }
+      // Independent operations - run concurrently
+      Future.sequence(Seq(
+        authRecords.create(at),
+        enrolments.bindEmprefs(token.gatewayId, token.emprefs)
+      )).map(_ => NoContent)
+    }.getOrElse(Future(BadRequest))
   }
 
 }
