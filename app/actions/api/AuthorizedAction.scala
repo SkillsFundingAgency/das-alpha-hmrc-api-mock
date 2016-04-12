@@ -1,8 +1,8 @@
 package actions.api
 
 import com.google.inject.Inject
-import db.levy.GatewayIdSchemeOps
-import db.outh2.AuthRecordOps
+import data.levy.GatewayIdSchemeOps
+import data.oauth2.AuthRecordOps
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}
 

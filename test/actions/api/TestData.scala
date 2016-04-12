@@ -1,7 +1,7 @@
 package actions.api
 
-import db.levy.GatewayIdSchemeOps
-import db.outh2.{AuthRecordOps, AuthRecordRow}
+import data.levy.GatewayIdSchemeOps
+import data.oauth2.{AuthRecordOps, AuthRecord}
 
 import scala.concurrent.Future
 
@@ -18,18 +18,18 @@ object TestData {
 
 
   val authRecords = new AuthRecordOps {
-    override def all(): Future[Seq[AuthRecordRow]] = Future.successful(Seq())
+    override def all(): Future[Seq[AuthRecord]] = Future.successful(Seq())
 
     override def clearExpired(): Future[Unit] = Future.successful(())
 
-    override def find(accessToken: String): Future[Option[AuthRecordRow]] = Future.successful {
-      if (accessToken == validToken) Some(AuthRecordRow(accessToken, "read:test", "gateway1", "client1", System.currentTimeMillis() + 1000, System.currentTimeMillis() - 1000))
+    override def find(accessToken: String): Future[Option[AuthRecord]] = Future.successful {
+      if (accessToken == validToken) Some(AuthRecord(accessToken, "read:test", "gateway1", "client1", System.currentTimeMillis() + 1000, System.currentTimeMillis() - 1000))
       else None
     }
 
-    override def create(token: AuthRecordRow): Future[Unit] = Future.successful(())
+    override def create(token: AuthRecord): Future[Unit] = Future.successful(())
 
-    override def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecordRow]] = find(accessToken)
+    override def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecord]] = find(accessToken)
 
     override def expire(token: String): Future[Int] = Future.successful(1)
   }

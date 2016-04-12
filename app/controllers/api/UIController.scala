@@ -2,7 +2,7 @@ package controllers.api
 
 import javax.inject.{Inject, Singleton}
 
-import db.outh2.AuthRecordOps
+import data.oauth2.AuthRecordOps
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext

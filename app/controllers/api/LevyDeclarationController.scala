@@ -3,7 +3,7 @@ package controllers.api
 import javax.inject._
 
 import actions.api.AuthorizedAction
-import db.levy.LevyDeclarationOps
+import data.levy.LevyDeclarationOps
 import models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
 import org.joda.time.LocalDate
 import play.api.libs.json.Json

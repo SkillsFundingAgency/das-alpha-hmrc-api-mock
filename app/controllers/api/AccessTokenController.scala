@@ -2,8 +2,8 @@ package controllers.api
 
 import javax.inject.{Inject, Singleton}
 
-import db.levy.GatewayIdSchemeOps
-import db.outh2.{AuthRecordOps, AuthRecordRow}
+import data.levy.GatewayIdSchemeOps
+import data.oauth2.{AuthRecordOps, AuthRecord}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, Controller}
 
@@ -21,7 +21,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: Ga
       case JsError(_) => Future.successful(BadRequest)
 
       case JsSuccess(token, _) =>
-        val at = AuthRecordRow(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
+        val at = AuthRecord(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
 
         // lear out any expired tokens in the background and ignore any db conflicts that
         // might occurs
