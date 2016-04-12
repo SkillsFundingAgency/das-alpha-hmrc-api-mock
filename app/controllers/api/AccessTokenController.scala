@@ -3,8 +3,8 @@ package controllers.api
 import javax.inject.{Inject, Singleton}
 
 import data.levy.GatewayIdSchemeOps
-import data.oauth2.{AuthRecordOps, AuthRecord}
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import data.oauth2.{AuthRecord, AuthRecordOps}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +16,10 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: Ga
 
   implicit val tokenFormat = Json.format[Token]
 
+  /**
+    * Accept a json structure that describes an access token and the information it relates to, including
+    * the list of emprefs that the token grants access to
+    */
   def provideToken = Action.async(parse.json) { implicit request =>
     request.body.validate[Token].map { token =>
       val at = AuthRecord(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
