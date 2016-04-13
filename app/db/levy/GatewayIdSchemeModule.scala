@@ -3,12 +3,12 @@ package db.levy
 import javax.inject.Inject
 
 import data.levy.{GatewayIdSchemeOps, GatewayIdScheme}
-import db.DBModule
+import db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait GatewayIdSchemeModule extends DBModule {
+trait GatewayIdSchemeModule extends SlickModule {
 
   import driver.api._
 
@@ -26,12 +26,15 @@ trait GatewayIdSchemeModule extends DBModule {
 
 }
 
-class GatewayIdSchemeDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends GatewayIdSchemeModule with GatewayIdSchemeOps {
+class GatewayIdSchemes @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends GatewayIdSchemeModule
 
-  import driver.api._
+class GatewayIdSchemeDAO @Inject()(protected val gatewayIdSchemes: GatewayIdSchemes)
+  extends GatewayIdSchemeOps {
 
-  def emprefsForId(gatewayId: String): Future[Seq[String]] = db.run(GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result)
+  import gatewayIdSchemes._
+  import api._
+
+  def emprefsForId(gatewayId: String): Future[Seq[String]] = run(GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result)
 
   /**
     * Replace existing list of emprefs held for the gatewayId with the new list

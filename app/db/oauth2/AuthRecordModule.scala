@@ -2,14 +2,14 @@ package db.oauth2
 
 import javax.inject.Inject
 
-import data.oauth2.{AuthRecordOps, AuthRecord}
-import db.DBModule
-import db.levy.GatewayIdSchemeModule
+import data.oauth2.{AuthRecord, AuthRecordOps}
+import db.SlickModule
+import db.levy.GatewayIdSchemes
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthRecordModule extends DBModule {
+trait AuthRecordModule extends SlickModule {
 
   import driver.api._
 
@@ -33,10 +33,14 @@ trait AuthRecordModule extends DBModule {
 
 }
 
-class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends AuthRecordModule with GatewayIdSchemeModule with AuthRecordOps {
+class AuthRecords @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AuthRecordModule
 
-  import driver.api._
+class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdSchemes: GatewayIdSchemes)
+  extends AuthRecordOps {
+
+  import authRecords._
+  import authRecords.api._
+  import gatewayIdSchemes.GatewayIdSchemes
 
   def all(): Future[Seq[AuthRecord]] = run(AccessTokens.result)
 
@@ -53,7 +57,7 @@ class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProv
     * Find an AuthRecordRow matching the token and scope, and which allows access to a gateway id
     * that has the taxId enrolled.
     */
-  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecord]] = db.run {
+  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecord]] = run {
     val q = for {
       t <- activeTokens if t.accessToken === accessToken && t.scope === scope
       i <- GatewayIdSchemes if i.id === t.gatewayId && i.empref === taxId
@@ -66,7 +70,7 @@ class AuthRecordDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
   def create(token: AuthRecord): Future[Unit] = run(AccessTokens += token).map(_ => ())
 
-  override def expire(token: String): Future[Int] = db.run {
+  override def expire(token: String): Future[Int] = run {
     val q = for {
       t <- AccessTokens if t.accessToken === token
     } yield t.expiresAt

@@ -5,10 +5,11 @@ import slick.driver.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait DBModule extends HasDatabaseConfigProvider[JdbcProfile] {
+trait SlickModule extends HasDatabaseConfigProvider[JdbcProfile] {
   implicit def ec: ExecutionContext
 
-  import driver.api._
+  val api =  driver.api
+  import api._
 
   def run[R, S <: NoStream, E <: Effect](action: DBIOAction[R, S, E]): Future[R] = db.run(action)
 }
