@@ -19,13 +19,17 @@ trait LevyDeclarationModule extends SlickModule {
 
     def month = column[Int]("month")
 
+    def submissionType = column[String]("submission_type")
+
+    def submissionDate = column[String]("submission_date")
+
     def amount = column[BigDecimal]("amount")
 
     def empref = column[String]("empref")
 
     def pk = primaryKey("levy_decl_pk", (year, month, empref))
 
-    def * = (year, month, amount, empref) <>(LevyDeclaration.tupled, LevyDeclaration.unapply)
+    def * = (year, month, amount, empref, submissionType, submissionDate) <>(LevyDeclaration.tupled, LevyDeclaration.unapply)
   }
 
 }

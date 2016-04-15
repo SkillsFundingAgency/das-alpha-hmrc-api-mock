@@ -17,7 +17,7 @@ class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, Auth
 
   def levyDeclarations(empref: EmpRef, months: Option[Int]) =
     AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
-      listDeclarations(empref, months.getOrElse(36).min(36)).map(decls => Ok(Json.toJson(decls)))
+      listDeclarations(empref, months.getOrElse(48).min(48)).map(decls => Ok(Json.toJson(decls)))
     }
 
   /**
@@ -29,7 +29,7 @@ class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, Auth
     */
   def listDeclarations(empref: EmpRef, months: Int): Future[LevyDeclarations] = {
     declarations.byEmpref(empref.value).map { rows =>
-      val decls = rows.map { d => LevyDeclaration(PayrollMonth(d.year, d.month), d.amount) }
+      val decls = rows.map { d => LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate) }
 
       val englishFraction = EnglishFraction(0.83, new LocalDate)
 

@@ -2,7 +2,7 @@ package data.levy
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class LevyDeclaration(year: Int, month: Int, amount: BigDecimal, empref: String)
+case class LevyDeclaration(year: Int, month: Int, amount: BigDecimal, empref: String, submissionType: String, submissionDate: String)
 
 trait LevyDeclarationOps {
   def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]]
