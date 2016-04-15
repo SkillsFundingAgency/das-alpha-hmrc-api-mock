@@ -33,7 +33,7 @@ trait AuthRecordModule extends SlickModule {
 
 }
 
-class AuthRecords @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends AuthRecordModule
+class AuthRecords @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends AuthRecordModule
 
 class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdSchemes: GatewayIdSchemes)
   extends AuthRecordOps {
@@ -42,7 +42,7 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
   import authRecords.api._
   import gatewayIdSchemes.GatewayIdSchemes
 
-  def all(): Future[Seq[AuthRecord]] = run(AccessTokens.result)
+  override def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]] = run(AccessTokens.result)
 
   val expiredTokens = AccessTokens.filter(_.expiresAt < System.currentTimeMillis())
 
@@ -51,13 +51,13 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
   /**
     * Find a row with the given access token that has not expired
     */
-  def find(accessToken: String): Future[Option[AuthRecord]] = run(activeTokens.filter(t => t.accessToken === accessToken).result.headOption)
+  override def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = run(activeTokens.filter(t => t.accessToken === accessToken).result.headOption)
 
   /**
     * Find an AuthRecordRow matching the token and scope, and which allows access to a gateway id
     * that has the taxId enrolled.
     */
-  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecord]] = run {
+  override def find(accessToken: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = run {
     val q = for {
       t <- activeTokens if t.accessToken === accessToken && t.scope === scope
       i <- GatewayIdSchemes if i.id === t.gatewayId && i.empref === taxId
@@ -66,11 +66,11 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
     q.result.headOption
   }
 
-  def clearExpired(): Future[Unit] = run(expiredTokens.delete).map(_ => ())
+  override def clearExpired()(implicit ec: ExecutionContext): Future[Unit] = run(expiredTokens.delete).map(_ => ())
 
-  def create(token: AuthRecord): Future[Unit] = run(AccessTokens += token).map(_ => ())
+  override def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = run(AccessTokens += token).map(_ => ())
 
-  override def expire(token: String): Future[Int] = run {
+  override def expire(token: String)(implicit ec: ExecutionContext): Future[Int] = run {
     val q = for {
       t <- AccessTokens if t.accessToken === token
     } yield t.expiresAt

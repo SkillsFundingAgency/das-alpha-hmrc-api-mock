@@ -3,11 +3,9 @@ package db
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.driver.JdbcProfile
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait SlickModule extends HasDatabaseConfigProvider[JdbcProfile] {
-  implicit def ec: ExecutionContext
-
   val api =  driver.api
   import api._
 

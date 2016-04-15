@@ -30,16 +30,14 @@ trait LevyDeclarationModule extends SlickModule {
 
 }
 
-class LevyDeclarations @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
-  extends LevyDeclarationModule
+class LevyDeclarations @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends LevyDeclarationModule
 
-class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarations)
-  extends LevyDeclarationOps {
+class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarations) extends LevyDeclarationOps {
 
   import levyDeclarations._
   import levyDeclarations.api._
 
-  def byEmpref(empref: String): Future[Seq[LevyDeclaration]] = run(LevyDeclarations.filter(_.empref === empref).result)
+  def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]] = run(LevyDeclarations.filter(_.empref === empref).result)
 
-  def insert(cat: LevyDeclaration): Future[Unit] = run(LevyDeclarations += cat).map { _ => () }
+  def insert(cat: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit] = run(LevyDeclarations += cat).map { _ => () }
 }

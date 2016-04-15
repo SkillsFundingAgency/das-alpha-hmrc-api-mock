@@ -2,7 +2,7 @@ package db.levy
 
 import javax.inject.Inject
 
-import data.levy.{GatewayIdSchemeOps, GatewayIdScheme}
+import data.levy.{GatewayIdScheme, GatewayIdSchemeOps}
 import db.SlickModule
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -26,7 +26,7 @@ trait GatewayIdSchemeModule extends SlickModule {
 
 }
 
-class GatewayIdSchemes @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext) extends GatewayIdSchemeModule
+class GatewayIdSchemes @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GatewayIdSchemeModule
 
 class GatewayIdSchemeDAO @Inject()(protected val gatewayIdSchemes: GatewayIdSchemes)
   extends GatewayIdSchemeOps {
@@ -34,12 +34,12 @@ class GatewayIdSchemeDAO @Inject()(protected val gatewayIdSchemes: GatewayIdSche
   import gatewayIdSchemes._
   import api._
 
-  def emprefsForId(gatewayId: String): Future[Seq[String]] = run(GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result)
+  def emprefsForId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[String]] = run(GatewayIdSchemes.filter(_.id === gatewayId).map(_.empref).result)
 
   /**
     * Replace existing list of emprefs held for the gatewayId with the new list
     */
-  def bindEmprefs(gatewayId: String, emprefs: List[String]): Future[Unit] = run {
+  def bindEmprefs(gatewayId: String, emprefs: List[String])(implicit ec: ExecutionContext): Future[Unit] = run {
     for {
       _ <- GatewayIdSchemes.filter(_.id === gatewayId).delete
       _ <- GatewayIdSchemes ++= emprefs.map(e => GatewayIdScheme(gatewayId, e))

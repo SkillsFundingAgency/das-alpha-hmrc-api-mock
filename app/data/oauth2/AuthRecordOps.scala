@@ -2,7 +2,7 @@ package data.oauth2
 
 import org.joda.time.format.DateTimeFormat
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRecord(
                           accessToken: String,
@@ -16,15 +16,15 @@ case class AuthRecord(
 }
 
 trait AuthRecordOps {
-  def all(): Future[Seq[AuthRecord]]
+  def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]]
 
-  def find(accessToken: String): Future[Option[AuthRecord]]
+  def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
-  def find(accessToken: String, taxId: String, scope: String): Future[Option[AuthRecord]]
+  def find(accessToken: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
-  def clearExpired(): Future[Unit]
+  def clearExpired()(implicit ec: ExecutionContext): Future[Unit]
 
-  def create(token: AuthRecord): Future[Unit]
+  def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 
-  def expire(token: String): Future[Int]
+  def expire(token: String)(implicit ec: ExecutionContext): Future[Int]
 }
