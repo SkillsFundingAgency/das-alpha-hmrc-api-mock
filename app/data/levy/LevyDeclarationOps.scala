@@ -7,5 +7,9 @@ case class LevyDeclaration(year: Int, month: Int, amount: BigDecimal, empref: St
 trait LevyDeclarationOps {
   def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]]
 
-  def insert(cat: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit]
+  def insert(decl: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit]
+
+  def insert(decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit]
+
+  def deleteForEmpref(empref: String)(implicit ec: ExecutionContext): Future[Int]
 }

@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.admin
 
 import javax.inject.{Inject, Singleton}
 
@@ -15,7 +15,7 @@ class UIController @Inject()(authRecords: AuthRecordOps)(implicit ec: ExecutionC
   }
 
   def expireToken(token: String) = Action.async { implicit request =>
-    authRecords.expire(token).map(_ => Redirect(controllers.api.routes.UIController.index()))
+    authRecords.expire(token).map(_ => Redirect(controllers.admin.routes.UIController.index()))
   }
 
 }

@@ -27,8 +27,6 @@ trait LevyDeclarationModule extends SlickModule {
 
     def empref = column[String]("empref")
 
-    def pk = primaryKey("levy_decl_pk", (year, month, empref))
-
     def * = (year, month, amount, empref, submissionType, submissionDate) <>(LevyDeclaration.tupled, LevyDeclaration.unapply)
   }
 
@@ -41,7 +39,12 @@ class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarations) extends L
   import levyDeclarations._
   import levyDeclarations.api._
 
-  def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]] = run(LevyDeclarations.filter(_.empref === empref).result)
+  override def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]] = run(LevyDeclarations.filter(_.empref === empref).result)
 
-  def insert(cat: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit] = run(LevyDeclarations += cat).map { _ => () }
+  override def insert(decl: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit] = run(LevyDeclarations += decl).map { _ => () }
+
+  override def insert(decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit] = run(LevyDeclarations ++= decls).map(_ => ())
+
+  override def deleteForEmpref(empref: String)(implicit ec: ExecutionContext): Future[Int] =
+    run(LevyDeclarations.filter(_.empref === empref).delete)
 }
