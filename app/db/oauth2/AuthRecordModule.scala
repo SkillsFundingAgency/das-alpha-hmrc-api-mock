@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import data.oauth2.{AuthRecord, AuthRecordOps}
 import db.SlickModule
-import db.levy.GatewayIdSchemes
+import db.levy.Enrolments
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,12 +35,12 @@ trait AuthRecordModule extends SlickModule {
 
 class AuthRecords @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends AuthRecordModule
 
-class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdSchemes: GatewayIdSchemes)
+class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdSchemes: Enrolments)
   extends AuthRecordOps {
 
   import authRecords._
   import authRecords.api._
-  import gatewayIdSchemes.GatewayIdSchemes
+  import gatewayIdSchemes.Enrolments
 
   override def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]] = run(AccessTokens.result)
 
@@ -57,10 +57,10 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
     * Find an AuthRecordRow matching the token and scope, and which allows access to a gateway id
     * that has the taxId enrolled.
     */
-  override def find(accessToken: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = run {
+  override def find(accessToken: String, identifierType: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = run {
     val q = for {
       t <- activeTokens if t.accessToken === accessToken && t.scope === scope
-      i <- GatewayIdSchemes if i.id === t.gatewayId && i.empref === taxId
+      i <- Enrolments if i.gatewayId === t.gatewayId && i.taxId === taxId
     } yield t
 
     q.result.headOption

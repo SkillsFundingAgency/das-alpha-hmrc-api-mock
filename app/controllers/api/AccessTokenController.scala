@@ -2,7 +2,7 @@ package controllers.api
 
 import javax.inject.{Inject, Singleton}
 
-import data.levy.GatewayIdSchemeOps
+import data.levy.{EnrolmentOps, ServiceBinding}
 import data.oauth2.{AuthRecord, AuthRecordOps}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -10,10 +10,12 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: GatewayIdSchemeOps)(implicit ec: ExecutionContext) extends Controller {
+class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: EnrolmentOps)(implicit ec: ExecutionContext) extends Controller {
 
-  case class Token(value: String, scope: String, gatewayId: String, emprefs: List[String], clientId: String, expiresAt: Long)
 
+  case class Token(value: String, scope: String, gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
+
+  implicit val sbFormat = Json.format[ServiceBinding]
   implicit val tokenFormat = Json.format[Token]
 
   /**
@@ -31,7 +33,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: Ga
       // Independent operations - run concurrently
       Future.sequence(Seq(
         authRecords.create(at),
-        enrolments.bindEmprefs(token.gatewayId, token.emprefs)
+        enrolments.bindEnrolments(token.gatewayId, token.enrolments)
       )).map(_ => NoContent)
     }.getOrElse(Future(BadRequest))
   }

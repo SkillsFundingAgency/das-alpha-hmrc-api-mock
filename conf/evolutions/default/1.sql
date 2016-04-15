@@ -8,10 +8,11 @@ CREATE TABLE "levy_declaration" (
   PRIMARY KEY ("year", "month", "empref")
 );
 
-CREATE TABLE "gateway_id_scheme" (
-  "id"     VARCHAR NOT NULL,
-  "empref" VARCHAR NOT NULL,
-  PRIMARY KEY ("id", "empref")
+CREATE TABLE "enrolment" (
+  "gateway_id"      VARCHAR NOT NULL,
+  "identifier_type" VARCHAR NOT NULL,
+  "tax_id"          VARCHAR NOT NULL,
+  PRIMARY KEY ("gateway_id", "identifier_type", "tax_id")
 );
 
 CREATE TABLE "auth_record" (
@@ -33,6 +34,6 @@ INSERT INTO "levy_declaration" ("year", "month", "amount", "empref") VALUES (201
 
 # --- !Downs
 
-DROP TABLE "gateway_id_scheme";
+DROP TABLE "enrolment";
 DROP TABLE "levy_declaration";
 DROP TABLE "auth_record";

@@ -5,13 +5,13 @@ import org.joda.time.format.DateTimeFormat
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRecord(
-                          accessToken: String,
-                          scope: String,
-                          gatewayId: String,
-                          clientId: String,
-                          expiresAt: Long,
-                          createdAt: Long
-                        ) {
+                       accessToken: String,
+                       scope: String,
+                       gatewayId: String,
+                       clientId: String,
+                       expiresAt: Long,
+                       createdAt: Long
+                     ) {
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
 }
 
@@ -20,7 +20,7 @@ trait AuthRecordOps {
 
   def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
-  def find(accessToken: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+  def find(accessToken: String, identifierType: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
   def clearExpired()(implicit ec: ExecutionContext): Future[Unit]
 

@@ -13,11 +13,12 @@ import uk.gov.hmrc.domain.EmpRef
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthenticatedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
+class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
 
-  def levyDeclarations(empref: EmpRef, months: Option[Int]) = AuthenticatedAction(empref.value, "read:apprenticeship-levy").async { implicit request =>
-    listDeclarations(empref, months.getOrElse(36).min(36)).map(decls => Ok(Json.toJson(decls)))
-  }
+  def levyDeclarations(empref: EmpRef, months: Option[Int]) =
+    AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
+      listDeclarations(empref, months.getOrElse(36).min(36)).map(decls => Ok(Json.toJson(decls)))
+    }
 
   /**
     * Build a LevyDeclarations structure for the empref for up to the given number of months

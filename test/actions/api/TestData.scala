@@ -1,6 +1,6 @@
 package actions.api
 
-import data.levy.GatewayIdSchemeOps
+import data.levy.{EnrolmentOps, ServiceBinding}
 import data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +14,7 @@ object TestData {
 
   val invalidToken = "xyz"
 
-  val testEmprefs = List("123/AB12345")
+  val testBindings = List(ServiceBinding("empref", "123/AB12345"))
 
 
   val authRecords = new AuthRecordOps {
@@ -29,16 +29,16 @@ object TestData {
 
     override def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
 
-    override def find(accessToken: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = find(accessToken)
+    override def find(accessToken: String, identifierType:String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = find(accessToken)
 
     override def expire(token: String)(implicit ec: ExecutionContext): Future[Int] = Future.successful(1)
   }
 
-  val enrolments = new GatewayIdSchemeOps {
-    override def bindEmprefs(gatewayId: String, emprefs: List[String])(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
+  val enrolments = new EnrolmentOps {
+    override def bindEnrolments(gatewayId: String, emprefs: List[ServiceBinding])(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
 
-    override def emprefsForId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[String]] = Future.successful {
-      if (gatewayId == "gateway1") testEmprefs else Seq()
+    override def enrolmentsForGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[ServiceBinding]] = Future.successful {
+      if (gatewayId == "gateway1") testBindings else Seq()
     }
   }
 

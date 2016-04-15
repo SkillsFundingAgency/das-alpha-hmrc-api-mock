@@ -11,12 +11,12 @@ class AuthorizedActionTest extends FlatSpec with Matchers with ScalaFutures with
   import TestData._
 
   "validateToken" should "return true" in {
-    val ab = testAction("123/AB12345", "read:test")
-    ab.validateToken(validToken, "123/AB12345", "read:test").futureValue shouldBe true
+    val ab = testAction("empref", "123/AB12345", "read:test")
+    ab.validateToken(validToken, "empref", "123/AB12345", "read:test").futureValue shouldBe true
   }
 
   it should "return an error" in {
-    testAction("", "").validateToken(invalidToken, "", "").futureValue shouldBe false
+    testAction("", "", "").validateToken(invalidToken, "", "", "").futureValue shouldBe false
   }
 
   import TestRequests._
@@ -26,22 +26,22 @@ class AuthorizedActionTest extends FlatSpec with Matchers with ScalaFutures with
   def ok[A](request: Request[A]): Future[Result] = Future.successful(Ok(""))
 
   "invokeBlock" should "return an Unauthorized when there is no Authorization header" in {
-    val result: Result = testAction("", "").invokeBlock(requestWithoutAuthorization, badRequest).futureValue
+    val result: Result = testAction("empref", "", "").invokeBlock(requestWithoutAuthorization, badRequest).futureValue
     result.header.status shouldBe 401
   }
 
   it should "return an Unauthorized when the Authorization header is not Bearer" in {
-    val result = testAction("", "").invokeBlock(requestWithBasicAuth, badRequest).futureValue
+    val result = testAction("", "", "").invokeBlock(requestWithBasicAuth, badRequest).futureValue
     result.header.status shouldBe 401
   }
 
   it should "return an Unauthorized when the Authorization header is a non-matching Bearer token" in {
-    val result = testAction("", "").invokeBlock(requestWithNonMatchingBearer, badRequest).futureValue
+    val result = testAction("", "", "").invokeBlock(requestWithNonMatchingBearer, badRequest).futureValue
     result.header.status shouldBe 401
   }
 
   it should "return an ApiRequest when the Authorization header is a matching Bearer token" in {
-    val result = testAction("abc", "read:test").invokeBlock(requestWithMatchingBearer, ok).futureValue
+    val result = testAction("empref", "abc", "read:test").invokeBlock(requestWithMatchingBearer, ok).futureValue
     result.header.status shouldBe 200
   }
 }
