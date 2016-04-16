@@ -11,5 +11,5 @@ trait LevyDeclarationOps {
 
   def insert(decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit]
 
-  def deleteForEmpref(empref: String)(implicit ec: ExecutionContext): Future[Int]
+  def replaceForEmpref(empref:String, decls:Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit]
 }

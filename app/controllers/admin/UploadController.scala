@@ -13,7 +13,7 @@ class UploadController @Inject()(levyDeclarations: LevyDeclarationOps)(implicit 
 
   /**
     * This is a very basic uploader. It will remove all of the existing declarations associated with the
-    * empref with the values in the json
+    * empref and replace them with the values in the json
     */
   def replaceDeclarations() = Action.async(parse.json) { implicit request =>
     request.body.validate[LevyDeclarations] match {
@@ -23,14 +23,11 @@ class UploadController @Inject()(levyDeclarations: LevyDeclarationOps)(implicit 
   }
 
   def insertDecls(decls: LevyDeclarations): Future[Unit] = {
-    val rows = decls.declarations.map { d =>
+    val newRows = decls.declarations.map { d =>
       LevyDeclaration(d.payrollMonth.year, d.payrollMonth.month, d.amount, decls.empref.value, d.submissionType, d.submissionDate)
     }
 
-    for {
-      _ <- levyDeclarations.deleteForEmpref(decls.empref.value)
-      _ <- levyDeclarations.insert(rows)
-    } yield ()
+    levyDeclarations.replaceForEmpref(decls.empref.value, newRows)
   }
 
 }
