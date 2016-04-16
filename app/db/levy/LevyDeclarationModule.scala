@@ -45,10 +45,10 @@ class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarations) extends L
 
   override def insert(decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit] = run(LevyDeclarations ++= decls).map(_ => ())
 
-  override def replaceForEmpref(empref: String, decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit] = run {
+  override def replaceForEmpref(empref: String, decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[(Int, Int)] = run {
     for {
-      _ <- LevyDeclarations.filter(_.empref === empref).delete
-      _ <- LevyDeclarations ++= decls
-    } yield ()
+      deleteCount <- LevyDeclarations.filter(_.empref === empref).delete
+      insertCount <- LevyDeclarations ++= decls
+    } yield (deleteCount, insertCount.getOrElse(0))
   }
 }

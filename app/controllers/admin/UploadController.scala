@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import data.levy.{LevyDeclaration, LevyDeclarationOps}
 import models.LevyDeclarations
+import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, Controller}
 
@@ -17,12 +18,15 @@ class UploadController @Inject()(levyDeclarations: LevyDeclarationOps)(implicit 
     */
   def replaceDeclarations() = Action.async(parse.json) { implicit request =>
     request.body.validate[LevyDeclarations] match {
-      case JsSuccess(decls, _) => insertDecls(decls).map(_ => NoContent).recover { case _ => BadRequest }
+      case JsSuccess(decls, _) => replaceDecls(decls).map { case (deleted, inserted) =>
+        Logger.info(s"Deleted $deleted declarations and inserted $inserted new ones")
+        NoContent
+      }.recover { case _ => BadRequest }
       case JsError(errs) => Future.successful(BadRequest)
     }
   }
 
-  def insertDecls(decls: LevyDeclarations): Future[Unit] = {
+  def replaceDecls(decls: LevyDeclarations): Future[(Int, Int)] = {
     val newRows = decls.declarations.map { d =>
       LevyDeclaration(d.payrollMonth.year, d.payrollMonth.month, d.amount, decls.empref.value, d.submissionType, d.submissionDate)
     }
