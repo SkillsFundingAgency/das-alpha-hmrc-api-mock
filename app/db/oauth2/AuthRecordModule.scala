@@ -5,7 +5,6 @@ import javax.inject.Inject
 import data.oauth2.{AuthRecord, AuthRecordOps}
 import db.SlickModule
 import db.levy.Enrolments
-import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,9 +32,7 @@ trait AuthRecordModule extends SlickModule {
 
 }
 
-class AuthRecords @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends AuthRecordModule
-
-class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdSchemes: Enrolments)
+class AuthRecordDAO @Inject()(protected val authRecords: AuthRecordModule, gatewayIdSchemes: Enrolments)
   extends AuthRecordOps {
 
   import authRecords._

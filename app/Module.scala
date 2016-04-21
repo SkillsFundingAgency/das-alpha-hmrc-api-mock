@@ -2,7 +2,8 @@ import com.google.inject.AbstractModule
 import data.levy.{EnrolmentOps, LevyDeclarationOps}
 import data.oauth2.AuthRecordOps
 import db.levy.{EnrolmentDAO, LevyDeclarationDAO}
-import db.oauth2.AuthRecordDAO
+import db.oauth2.{AuthRecordDAO, AuthRecordModule}
+import slicks.AuthRecords
 
 class Module extends AbstractModule {
 
@@ -10,6 +11,8 @@ class Module extends AbstractModule {
     bind(classOf[EnrolmentOps]).to(classOf[EnrolmentDAO])
     bind(classOf[LevyDeclarationOps]).to(classOf[LevyDeclarationDAO])
     bind(classOf[AuthRecordOps]).to(classOf[AuthRecordDAO])
+
+    bind(classOf[AuthRecordModule]).to(classOf[AuthRecords])
   }
 
 }

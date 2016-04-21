@@ -1,13 +1,12 @@
 package controllers.admin
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import data.oauth2.AuthRecordOps
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext
 
-@Singleton
 class UIController @Inject()(authRecords: AuthRecordOps)(implicit ec: ExecutionContext) extends Controller {
 
   def index = Action.async { implicit request =>
