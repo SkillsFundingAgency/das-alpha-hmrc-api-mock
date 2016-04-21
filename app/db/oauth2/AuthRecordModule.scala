@@ -13,9 +13,9 @@ trait AuthRecordModule extends SlickModule {
 
   import driver.api._
 
-  val AccessTokens = TableQuery[AccessTokenTable]
+  val AuthRecords = TableQuery[AuthRecordTable]
 
-  class AccessTokenTable(tag: Tag) extends Table[AuthRecord](tag, "auth_record") {
+  class AuthRecordTable(tag: Tag) extends Table[AuthRecord](tag, "auth_record") {
     def clientId = column[String]("client_id")
 
     def gatewayId = column[String]("gateway_id")
@@ -42,11 +42,11 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
   import authRecords.api._
   import gatewayIdSchemes.Enrolments
 
-  override def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]] = run(AccessTokens.result)
+  override def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]] = run(AuthRecords.result)
 
-  val expiredTokens = AccessTokens.filter(_.expiresAt < System.currentTimeMillis())
+  val expiredTokens = AuthRecords.filter(_.expiresAt < System.currentTimeMillis())
 
-  val activeTokens = AccessTokens.filter(_.expiresAt >= System.currentTimeMillis())
+  val activeTokens = AuthRecords.filter(_.expiresAt >= System.currentTimeMillis())
 
   /**
     * Find a row with the given access token that has not expired
@@ -68,11 +68,11 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecords, gatewayIdS
 
   override def clearExpired()(implicit ec: ExecutionContext): Future[Unit] = run(expiredTokens.delete).map(_ => ())
 
-  override def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = run(AccessTokens += token).map(_ => ())
+  override def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = run(AuthRecords += token).map(_ => ())
 
   override def expire(token: String)(implicit ec: ExecutionContext): Future[Int] = run {
     val q = for {
-      t <- AccessTokens if t.accessToken === token
+      t <- AuthRecords if t.accessToken === token
     } yield t.expiresAt
 
     q.update(System.currentTimeMillis())
