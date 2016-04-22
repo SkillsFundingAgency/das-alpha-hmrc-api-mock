@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: EnrolmentOps)(implicit ec: ExecutionContext) extends Controller {
 
 
-  case class Token(value: String, scope: String, gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
+  case class Token(value: String, scopes: List[String], gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
 
   implicit val sbFormat = Json.format[ServiceBinding]
   implicit val tokenFormat = Json.format[Token]
@@ -24,7 +24,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
     */
   def provideToken = Action.async(parse.json) { implicit request =>
     request.body.validate[Token].map { token =>
-      val at = AuthRecord(token.value, token.scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis())
+      val ats = token.scopes.map { scope => AuthRecord(token.value, scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis()) }
 
       // lear out any expired tokens in the background and ignore any db
       // errors that might occur
@@ -32,7 +32,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
 
       // Independent operations - run concurrently
       Future.sequence(Seq(
-        authRecords.create(at),
+        authRecords.create(ats),
         enrolments.bindEnrolments(token.gatewayId, token.enrolments)
       )).map(_ => NoContent)
     }.getOrElse(Future(BadRequest))

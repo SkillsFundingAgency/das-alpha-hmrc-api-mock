@@ -24,7 +24,9 @@ trait AuthRecordOps {
 
   def clearExpired()(implicit ec: ExecutionContext): Future[Unit]
 
-  def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
+  def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
+
+  def create(records: Seq[AuthRecord])(implicit ec: ExecutionContext): Future[Unit]
 
   def expire(token: String)(implicit ec: ExecutionContext): Future[Int]
 }
