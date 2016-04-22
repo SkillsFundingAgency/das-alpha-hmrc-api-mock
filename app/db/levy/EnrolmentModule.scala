@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import data.levy.{Enrolment, EnrolmentOps, ServiceBinding}
 import db.SlickModule
-import play.api.db.slick.DatabaseConfigProvider
+import slick.driver.JdbcProfile
 import slick.lifted.PrimaryKey
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,9 +29,7 @@ trait EnrolmentModule extends SlickModule {
 
 }
 
-class Enrolments @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends EnrolmentModule
-
-class EnrolmentDAO @Inject()(protected val gatewayIdSchemes: Enrolments)
+class EnrolmentDAO @Inject()(protected val gatewayIdSchemes: EnrolmentModule)
   extends EnrolmentOps {
 
   import gatewayIdSchemes._

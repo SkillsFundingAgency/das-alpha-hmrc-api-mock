@@ -4,7 +4,6 @@ import javax.inject.Inject
 
 import data.levy.{LevyDeclaration, LevyDeclarationOps}
 import db.SlickModule
-import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,9 +31,7 @@ trait LevyDeclarationModule extends SlickModule {
 
 }
 
-class LevyDeclarations @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends LevyDeclarationModule
-
-class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarations) extends LevyDeclarationOps {
+class LevyDeclarationDAO @Inject()(levyDeclarations: LevyDeclarationModule) extends LevyDeclarationOps {
 
   import levyDeclarations._
   import levyDeclarations.api._

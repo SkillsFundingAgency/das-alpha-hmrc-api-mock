@@ -1,4 +1,4 @@
-package slicks
+package playslicks
 
 import javax.inject.Inject
 

@@ -3,7 +3,7 @@ import data.levy.{EnrolmentOps, LevyDeclarationOps}
 import data.oauth2.AuthRecordOps
 import db.levy.{EnrolmentDAO, LevyDeclarationDAO}
 import db.oauth2.{AuthRecordDAO, AuthRecordModule}
-import slicks.AuthRecords
+import playslicks.AuthRecords
 
 class Module extends AbstractModule {
 

@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import data.oauth2.{AuthRecord, AuthRecordOps}
 import db.SlickModule
-import db.levy.Enrolments
+import playslicks.Enrolments
 
 import scala.concurrent.{ExecutionContext, Future}
 
