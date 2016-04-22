@@ -27,9 +27,11 @@ object TestData {
       else None
     }
 
-    override def create(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
+    override def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
 
-    override def find(accessToken: String, identifierType:String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = find(accessToken)
+    override def create(records: Seq[AuthRecord])(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
+
+    override def find(accessToken: String, identifierType: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = find(accessToken)
 
     override def expire(token: String)(implicit ec: ExecutionContext): Future[Int] = Future.successful(1)
   }
