@@ -29,11 +29,14 @@ class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, Auth
     */
   def listDeclarations(empref: EmpRef, months: Int): Future[LevyDeclarations] = {
     declarations.byEmpref(empref.value).map { rows =>
-      val decls = rows.map { d => LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate) }
 
-      val englishFraction = EnglishFraction(0.83, new LocalDate)
 
-      LevyDeclarations(empref, englishFraction, 15000, decls)
+      val decls = rows.zipWithIndex.map { case (d, i) =>
+        val englishFraction = EnglishFraction((0.75 + 0.02 * i).min(0.80), new LocalDate)
+        LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate, englishFraction)
+      }
+
+      LevyDeclarations(empref, levyAllowanceApplied = true, decls)
     }
   }
 }
