@@ -12,5 +12,6 @@ POST        /replace-declarations                                         contro
 # Routes for the API
 GET         /apprenticeship-levy/epaye/empref/*empref/declarations        controllers.api.LevyDeclarationController.levyDeclarations(empref :EmpRef, months:Option[Int])
 
-PUT         /auth/provide-token                                           controllers.api.AccessTokenController.provideToken
+PUT         /auth/provide-token                                           controllers.auth.AccessTokenController.provideToken
 
+GET         /user-info                                                    controllers.api.UserInfoController.userInfo

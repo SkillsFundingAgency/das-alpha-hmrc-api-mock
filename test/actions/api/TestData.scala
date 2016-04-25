@@ -34,12 +34,14 @@ object TestData {
     override def find(accessToken: String, identifierType: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = find(accessToken)
 
     override def expire(token: String)(implicit ec: ExecutionContext): Future[Int] = Future.successful(1)
+
+    override def scopes(token: String)(implicit ec: ExecutionContext): Future[Seq[String]] = Future.successful(Seq())
   }
 
   val enrolments = new EnrolmentOps {
     override def bindEnrolments(gatewayId: String, emprefs: List[ServiceBinding])(implicit ec: ExecutionContext): Future[Unit] = Future.successful(())
 
-    override def enrolmentsForGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[ServiceBinding]] = Future.successful {
+    override def forGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[ServiceBinding]] = Future.successful {
       if (gatewayId == "gateway1") testBindings else Seq()
     }
   }

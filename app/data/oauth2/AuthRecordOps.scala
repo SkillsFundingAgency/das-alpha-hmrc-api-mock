@@ -29,4 +29,6 @@ trait AuthRecordOps {
   def create(records: Seq[AuthRecord])(implicit ec: ExecutionContext): Future[Unit]
 
   def expire(token: String)(implicit ec: ExecutionContext): Future[Int]
+
+  def scopes(token:String)(implicit ec: ExecutionContext): Future[Seq[String]]
 }

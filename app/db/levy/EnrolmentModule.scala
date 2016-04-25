@@ -37,7 +37,7 @@ class EnrolmentDAO @Inject()(protected val gatewayIdSchemes: EnrolmentModule)
   import gatewayIdSchemes._
   import api._
 
-  def enrolmentsForGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[ServiceBinding]] = run {
+  def forGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Seq[ServiceBinding]] = run {
     val q = for {
       e <- Enrolments if e.gatewayId === gatewayId
     } yield (e.service, e.identifierType, e.taxId)

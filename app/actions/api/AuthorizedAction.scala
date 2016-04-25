@@ -8,8 +8,6 @@ import play.api.mvc.{ActionBuilder, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorizedRequest[A](val request: Request[A], val emprefs: List[String]) extends WrappedRequest[A](request)
-
 class AuthorizedActionBuilder(identifierType: String, taxId: String, scope: String, authRecords: AuthRecordOps, enrolments: EnrolmentOps)(implicit ec: ExecutionContext)
   extends ActionBuilder[Request] {
   override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
@@ -33,6 +31,6 @@ class AuthorizedActionBuilder(identifierType: String, taxId: String, scope: Stri
 
 
 class AuthorizedAction @Inject()(authRecords: AuthRecordOps, enrolments: EnrolmentOps)(implicit ec: ExecutionContext) {
-  def apply[A](identifierType: String, taxId: String, scope: String): AuthorizedActionBuilder =
+  def apply(identifierType: String, taxId: String, scope: String): AuthorizedActionBuilder =
     new AuthorizedActionBuilder(identifierType, taxId, scope, authRecords, enrolments)(ec)
 }

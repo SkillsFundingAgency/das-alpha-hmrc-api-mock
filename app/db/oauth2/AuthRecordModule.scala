@@ -63,6 +63,9 @@ class AuthRecordDAO @Inject()(protected val authRecords: AuthRecordModule, gatew
     q.result.headOption
   }
 
+  override def scopes(token: String)(implicit ec: ExecutionContext): Future[Seq[String]] =
+    run(AuthRecords.filter(_.accessToken === token).map(_.scope).result)
+
   override def clearExpired()(implicit ec: ExecutionContext): Future[Unit] = run(expiredTokens.delete).map(_ => ())
 
   override def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = run(AuthRecords += record).map(_ => ())

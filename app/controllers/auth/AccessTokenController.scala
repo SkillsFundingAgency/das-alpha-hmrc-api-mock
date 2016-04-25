@@ -1,6 +1,6 @@
 package controllers.auth
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import data.levy.{EnrolmentOps, ServiceBinding}
 import data.oauth2.{AuthRecord, AuthRecordOps}
@@ -9,9 +9,9 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
 class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: EnrolmentOps)(implicit ec: ExecutionContext) extends Controller {
 
+  import AccessTokenController.processScopes
 
   case class Token(value: String, scopes: List[String], gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
 
@@ -24,7 +24,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
     */
   def provideToken = Action.async(parse.json) { implicit request =>
     request.body.validate[Token].map { token =>
-      val ats = token.scopes.map { scope => AuthRecord(token.value, scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis()) }
+      val ats = processScopes(token.scopes).map { scope => AuthRecord(token.value, scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis()) }
 
       // lear out any expired tokens in the background and ignore any db
       // errors that might occur
@@ -38,4 +38,19 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
     }.getOrElse(Future(BadRequest))
   }
 
+
+}
+
+object AccessTokenController {
+  val opendIdConnectScopes = List("profile", "taxids")
+
+  /**
+    * Check for the "openid" scope and, if present, convert any valid OpenID Connect scope values.
+    * For example "profile" would become "openid:profile"
+    */
+  def processScopes(scopes: List[String]): List[String] = {
+    if (scopes.contains("openid")) {
+      scopes.filter(_ != "openid").map(s => if (opendIdConnectScopes.contains(s)) s"openid:$s" else s)
+    } else scopes
+  }
 }
