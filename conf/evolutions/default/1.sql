@@ -11,6 +11,7 @@ CREATE TABLE "levy_declaration" (
 
 CREATE TABLE "enrolment" (
   "gateway_id"      VARCHAR NOT NULL,
+  "service"         VARCHAR NOT NULL,
   "identifier_type" VARCHAR NOT NULL,
   "tax_id"          VARCHAR NOT NULL,
   PRIMARY KEY ("gateway_id", "identifier_type", "tax_id")

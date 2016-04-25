@@ -14,7 +14,7 @@ object TestData {
 
   val invalidToken = "xyz"
 
-  val testBindings = List(ServiceBinding("empref", "123/AB12345"))
+  val testBindings = List(ServiceBinding("epaye", "empref", "123/AB12345"))
 
 
   val authRecords = new AuthRecordOps {
