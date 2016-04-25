@@ -2,7 +2,7 @@ package data.levy
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ServiceBinding(service: String, identifierType: String, taxId: String)
+case class ServiceBinding(service: String, identifierType: String, identifier: String)
 
 case class Enrolment(gatewayId: String, service: String, identifierType: String, taxId: String)
 

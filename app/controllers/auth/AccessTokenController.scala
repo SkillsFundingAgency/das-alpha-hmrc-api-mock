@@ -37,8 +37,6 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
       )).map(_ => NoContent)
     }.getOrElse(Future(BadRequest))
   }
-
-
 }
 
 object AccessTokenController {

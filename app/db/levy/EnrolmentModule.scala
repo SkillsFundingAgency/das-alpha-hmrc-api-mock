@@ -51,7 +51,7 @@ class EnrolmentDAO @Inject()(protected val gatewayIdSchemes: EnrolmentModule)
   def bindEnrolments(gatewayId: String, enrolments: List[ServiceBinding])(implicit ec: ExecutionContext): Future[Unit] = run {
     for {
       _ <- Enrolments.filter(_.gatewayId === gatewayId).delete
-      _ <- Enrolments ++= enrolments.map(e => Enrolment(gatewayId, e.service, e.identifierType, e.taxId))
+      _ <- Enrolments ++= enrolments.map(e => Enrolment(gatewayId, e.service, e.identifierType, e.identifier))
     } yield ()
   }
 
