@@ -26,11 +26,11 @@ class UserInfoController @Inject()(OpenIDConnectAction: OpenIDConnectAction, aut
 
   def processClaim(accessToken: String, claim: String): Future[Seq[(String, JsValue)]] = {
     claim match {
-      case "openid:taxids" =>
+      case "openid:enrolments" =>
         OptionT(authRecords.find(accessToken)).map { a =>
           enrolments.forGatewayId(a.gatewayId)
         }.value.flatMap {
-          case Some(bf) => bf.map(bs => Seq("taxids" -> Json.toJson(bs.toList)))
+          case Some(bf) => bf.map(bs => Seq("enrolments" -> Json.toJson(bs.toList)))
           case None => Future.successful(Seq())
         }
 

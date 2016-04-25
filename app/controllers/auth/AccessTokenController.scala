@@ -42,7 +42,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
 }
 
 object AccessTokenController {
-  val opendIdConnectScopes = List("profile", "taxids")
+  val opendIdConnectScopes = List("profile", "enrolments")
 
   /**
     * Check for the "openid" scope and, if present, convert any valid OpenID Connect scope values.
