@@ -5,6 +5,10 @@ import javax.inject.Inject
 import uk.gov.bis.levyApiMock.data.levy.{EnrolmentOps, ServiceBinding}
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 import play.api.libs.json.Json
+import data.levy.{EnrolmentOps, ServiceBinding}
+import data.oauth2.{AuthRecord, AuthRecordOps}
+import play.api.Logger
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +27,7 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
     * the list of emprefs that the token grants access to
     */
   def provideToken = Action.async(parse.json) { implicit request =>
-    request.body.validate[Token].map { token =>
+    val f = request.body.validate[Token].map { token =>
       val ats = processScopes(token.scopes).map { scope => AuthRecord(token.value, scope, token.gatewayId, token.clientId, token.expiresAt, System.currentTimeMillis()) }
 
       // lear out any expired tokens in the background and ignore any db
@@ -35,7 +39,13 @@ class AccessTokenController @Inject()(authRecords: AuthRecordOps, enrolments: En
         authRecords.create(ats),
         enrolments.bindEnrolments(token.gatewayId, token.enrolments)
       )).map(_ => NoContent)
-    }.getOrElse(Future(BadRequest))
+    }
+    f match {
+      case JsSuccess(r, _) => r
+      case JsError(errs) =>
+        Logger.error(errs.toString)
+        Future.successful(BadRequest(errs.toString))
+    }
   }
 }
 
