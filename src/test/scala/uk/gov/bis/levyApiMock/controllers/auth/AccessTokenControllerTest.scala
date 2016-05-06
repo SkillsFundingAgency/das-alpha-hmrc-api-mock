@@ -10,8 +10,8 @@ class AccessTokenControllerTest extends FlatSpec with Matchers {
   }
 
   it should "drop the 'openid' scope and convert recognized scopes if 'openid' is present" in {
-    val scopes = List("unrecognized", "openid", "profile", "taxids")
-    val expectedScopes = List("unrecognized", "openid:profile", "openid:taxids")
+    val scopes = List("unrecognized", "openid", "profile", "enrolments")
+    val expectedScopes = List("unrecognized", "openid:profile", "openid:enrolments")
 
     AccessTokenController.processScopes(scopes) shouldBe expectedScopes
 
