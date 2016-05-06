@@ -1,0 +1,9 @@
+package uk.gov.bis.playslicks
+
+import javax.inject.Inject
+
+import uk.gov.bis.db.levy.EnrolmentModule
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.driver.JdbcProfile
+
+class Enrolments @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends EnrolmentModule with HasDatabaseConfigProvider[JdbcProfile]
