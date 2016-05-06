@@ -1,9 +1,9 @@
 import com.google.inject.AbstractModule
-import uk.gov.bis.data.levy.{EnrolmentOps, LevyDeclarationOps}
-import uk.gov.bis.data.oauth2.AuthRecordOps
-import uk.gov.bis.db.levy.{EnrolmentDAO, EnrolmentModule, LevyDeclarationDAO, LevyDeclarationModule}
-import uk.gov.bis.db.oauth2.{AuthRecordDAO, AuthRecordModule}
-import uk.gov.bis.playslicks.{AuthRecords, Enrolments, LevyDeclarations}
+import uk.gov.bis.levyApiMock.data.levy.{EnrolmentOps, LevyDeclarationOps}
+import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
+import uk.gov.bis.levyApiMock.db.levy.{EnrolmentDAO, EnrolmentModule, LevyDeclarationDAO, LevyDeclarationModule}
+import uk.gov.bis.levyApiMock.db.oauth2.{AuthRecordDAO, AuthRecordModule}
+import uk.gov.bis.levyApiMock.playslicks.{AuthRecords, Enrolments, LevyDeclarations}
 
 class Module extends AbstractModule {
 
