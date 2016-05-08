@@ -2,14 +2,11 @@ package uk.gov.bis.levyApiMock.controllers.auth
 
 import javax.inject.Inject
 
-import uk.gov.bis.levyApiMock.data.levy.{EnrolmentOps, ServiceBinding}
-import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
-import play.api.libs.json.Json
-import data.levy.{EnrolmentOps, ServiceBinding}
-import data.oauth2.{AuthRecord, AuthRecordOps}
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, Controller}
+import uk.gov.bis.levyApiMock.data.levy.{EnrolmentOps, ServiceBinding}
+import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
