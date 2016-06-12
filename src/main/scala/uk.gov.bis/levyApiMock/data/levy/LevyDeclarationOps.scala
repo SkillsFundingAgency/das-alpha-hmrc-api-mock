@@ -2,14 +2,14 @@ package uk.gov.bis.levyApiMock.data.levy
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class LevyDeclaration(year: Int, month: Int, amount: BigDecimal, empref: String, submissionType: String, submissionDate: String)
+case class LevyDeclarationData(year: Int, month: Int, amount: BigDecimal, empref: String, submissionType: String, submissionDate: String)
 
 trait LevyDeclarationOps {
-  def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclaration]]
+  def byEmpref(empref: String)(implicit ec: ExecutionContext): Future[Seq[LevyDeclarationData]]
 
-  def insert(decl: LevyDeclaration)(implicit ec: ExecutionContext): Future[Unit]
+  def insert(decl: LevyDeclarationData)(implicit ec: ExecutionContext): Future[Unit]
 
-  def insert(decls: Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[Unit]
+  def insert(decls: Seq[LevyDeclarationData])(implicit ec: ExecutionContext): Future[Unit]
 
-  def replaceForEmpref(empref:String, decls:Seq[LevyDeclaration])(implicit ec: ExecutionContext): Future[(Int, Int)]
+  def replaceForEmpref(empref:String, decls:Seq[LevyDeclarationData])(implicit ec: ExecutionContext): Future[(Int, Int)]
 }

@@ -2,11 +2,11 @@ package uk.gov.bis.levyApiMock.controllers.admin
 
 import javax.inject.Inject
 
-import uk.gov.bis.levyApiMock.data.levy.{LevyDeclaration, LevyDeclarationOps}
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, Controller}
-import uk.gov.bis.models.LevyDeclarations
+import uk.gov.bis.levyApiMock.data.levy.{LevyDeclarationData, LevyDeclarationOps}
+import uk.gov.bis.levyApiMock.models.LevyDeclarations
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,7 +28,7 @@ class UploadController @Inject()(levyDeclarations: LevyDeclarationOps)(implicit 
 
   def replaceDecls(decls: LevyDeclarations): Future[(Int, Int)] = {
     val newRows = decls.declarations.map { d =>
-      LevyDeclaration(d.payrollMonth.year, d.payrollMonth.month, d.amount, decls.empref.value, d.submissionType, d.submissionDate)
+      LevyDeclarationData(d.payrollMonth.year, d.payrollMonth.month, d.amount, decls.empref.value, d.submissionType, d.submissionDate)
     }
 
     levyDeclarations.replaceForEmpref(decls.empref.value, newRows)

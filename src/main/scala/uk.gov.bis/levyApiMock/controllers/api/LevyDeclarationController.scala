@@ -2,17 +2,15 @@ package uk.gov.bis.levyApiMock.controllers.api
 
 import javax.inject._
 
-import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.mvc._
-import uk.gov.bis.levyApiMock.data.levy.LevyDeclarationOps
 import uk.gov.bis.levyApiMock.api.AuthorizedAction
-import uk.gov.bis.models.{EnglishFraction, LevyDeclaration, LevyDeclarations, PayrollMonth}
+import uk.gov.bis.levyApiMock.data.levy.LevyDeclarationOps
+import uk.gov.bis.levyApiMock.models.{LevyDeclaration, LevyDeclarations, PayrollMonth}
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
 class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
 
   def levyDeclarations(empref: EmpRef, months: Option[Int]) =
@@ -29,13 +27,7 @@ class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, Auth
     */
   def listDeclarations(empref: EmpRef, months: Int): Future[LevyDeclarations] = {
     declarations.byEmpref(empref.value).map { rows =>
-
-
-      val decls = rows.zipWithIndex.map { case (d, i) =>
-        val englishFraction = EnglishFraction((0.75 + 0.02 * i).min(0.80), new LocalDate)
-        LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate, englishFraction)
-      }
-
+      val decls = rows.map { d => LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate) }
       LevyDeclarations(empref, levyAllowanceApplied = true, decls)
     }
   }
