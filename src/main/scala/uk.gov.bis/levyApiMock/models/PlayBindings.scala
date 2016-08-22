@@ -1,4 +1,4 @@
-package uk.gov.bis.models
+package uk.gov.bis.levyApiMock.models
 
 import play.api.mvc.PathBindable
 import uk.gov.hmrc.domain.EmpRef

@@ -2,33 +2,40 @@ package uk.gov.bis.levyApiMock.controllers.api
 
 import javax.inject._
 
-import play.api.libs.json.Json
+import org.joda.time.LocalDate
+import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.api.AuthorizedAction
 import uk.gov.bis.levyApiMock.data.levy.LevyDeclarationOps
-import uk.gov.bis.levyApiMock.models.{LevyDeclaration, LevyDeclarations, PayrollMonth}
+import uk.gov.bis.levyApiMock.models.LevyDeclarations
 import uk.gov.hmrc.domain.EmpRef
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
+class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext)
+  extends Controller {
 
-  def levyDeclarations(empref: EmpRef, months: Option[Int]) =
+  def levyDeclarations(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate]) =
     AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
-      listDeclarations(empref, months.getOrElse(48).min(48)).map(decls => Ok(Json.toJson(decls)))
+      //Action.async { implicit request =>
+      declarations.byEmpref(empref.value).map {
+        case Some(decls) => Ok(Json.toJson(filterByDate(decls, fromDate, toDate)))
+        case None => NotFound
+      }
     }
 
-  /**
-    * Build a LevyDeclarations structure for the empref for up to the given number of months
-    *
-    * @param empref identifies the payroll scheme
-    * @param months maximum number of months of data to return (will be limited to 36)
-    * @return
-    */
-  def listDeclarations(empref: EmpRef, months: Int): Future[LevyDeclarations] = {
-    declarations.byEmpref(empref.value).map { rows =>
-      val decls = rows.map { d => LevyDeclaration(PayrollMonth(d.year, d.month), d.amount, d.submissionType, d.submissionDate) }
-      LevyDeclarations(empref, levyAllowanceApplied = true, decls)
+  def filterByDate(decls: LevyDeclarations, fromDate: Option[LocalDate], toDate: Option[LocalDate]): LevyDeclarations = {
+    val filtered = decls.declarations.flatMap { decl =>
+      (decl, fromDate, toDate) match {
+        case (d, None, None) => Some(d)
+        case (d, Some(from), None) if !d.submissionTime.toLocalDate.isBefore(from) => Some(d)
+        case (d, None, Some(to)) if !d.submissionTime.toLocalDate.isAfter(to) => Some(d)
+        case (d, Some(from), Some(to)) if !d.submissionTime.toLocalDate.isBefore(from) && !d.submissionTime.toLocalDate.isAfter(to) => Some(d)
+        case _ => None
+      }
     }
+
+    decls.copy(declarations = filtered)
   }
+
 }

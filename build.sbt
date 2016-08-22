@@ -1,14 +1,18 @@
 name := """das-alpha-hmrc-api-mock"""
 
-enablePlugins(PlayScala)
-disablePlugins(PlayLayoutPlugin)
-
-enablePlugins(GitVersioning)
-enablePlugins(GitBranchPrompt)
+lazy val `das-alpha-hmrc-api-mock` = (project in file("."))
+  .enablePlugins(PlayScala)
+  .disablePlugins(PlayLayoutPlugin)
+  .enablePlugins(GitVersioning)
+  .enablePlugins(GitBranchPrompt)
 
 git.useGitDescribe := true
 
-routesImport += "uk.gov.hmrc.domain._, uk.gov.bis.models.PlayBindings._"
+routesImport ++= Seq(
+  "uk.gov.hmrc.domain._",
+  "uk.gov.bis.levyApiMock.models.PlayBindings._",
+  "uk.gov.bis.levyApiMock.models.QueryBinders._",
+  "org.joda.time.LocalDate")
 
 scalaVersion := "2.11.8"
 
@@ -20,7 +24,6 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "uk.gov.hmrc" %% "domain" % "3.5.0",
-
   "com.typesafe.play" %% "play-slick" % "2.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
   "com.h2database" % "h2" % "1.4.191",
@@ -28,5 +31,7 @@ libraryDependencies ++= Seq(
   "org.mindrot" % "jbcrypt" % "0.3m",
   "org.typelevel" %% "cats" % "0.4.0",
   "com.github.nscala-time" %% "nscala-time" % "2.12.0",
+  "org.reactivemongo" %% "reactivemongo" % "0.11.14",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
 )
