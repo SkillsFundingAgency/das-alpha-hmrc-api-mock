@@ -6,5 +6,6 @@ case class GatewayUser(gatewayID: String, password: String, empref: String, name
 
 trait GatewayUserOps {
   def forGatewayID(gatewayID: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]]
+
   def forEmpref(empref: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]]
 }
