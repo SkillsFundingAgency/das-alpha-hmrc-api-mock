@@ -2,23 +2,34 @@ package uk.gov.bis.levyApiMock.controllers.api
 
 import javax.inject._
 
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.api.AuthorizedAction
-import uk.gov.bis.levyApiMock.data.levy.{Fraction, FractionCalculation, FractionsOps}
+import uk.gov.bis.levyApiMock.controllers.DateRange
+import uk.gov.bis.levyApiMock.data.levy.{Fraction, FractionCalculation, FractionResponse, FractionsOps}
 import uk.gov.hmrc.domain.EmpRef
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class FractionsController @Inject()(fractions: FractionsOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
+class FractionsController @Inject()(fractionOps: FractionsOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
 
   implicit val fractionW = Json.writes[Fraction]
   implicit val fractionCalcW = Json.writes[FractionCalculation]
+  implicit val fractionRepsonseW = Json.writes[FractionResponse]
 
-  def fractions(empref: EmpRef, months: Option[Int]) =
-    AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
-      listFractions(empref, months.getOrElse(48).min(48)).map(decls => Ok(Json.toJson(decls)))
+  def fractions(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate]) =
+    //AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
+    Action.async { implicit request =>
+      val dateRange = DateRange(fromDate, toDate)
+      fractionOps.byEmpref(empref.value).map {
+        case Some(fs) => Ok(Json.toJson(filterByDate(fs, dateRange)))
+        case None => NotFound
+      }
     }
 
-  def listFractions(empref: EmpRef, months: Int): Future[Seq[FractionCalculation]] = fractions.byEmpref(empref.value)
+  def filterByDate(resp: FractionResponse, dateRange: DateRange): FractionResponse = {
+    val filtered = resp.fractionCalculations.filter(f => dateRange.contains(f.calculatedAt))
+    resp.copy(fractionCalculations = filtered)
+  }
 }
