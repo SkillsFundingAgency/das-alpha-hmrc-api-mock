@@ -5,7 +5,7 @@ import javax.inject._
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.bis.levyApiMock.api.AuthorizedAction
+import uk.gov.bis.levyApiMock.actions.AuthorizedAction
 import uk.gov.bis.levyApiMock.controllers.DateRange
 import uk.gov.bis.levyApiMock.data.levy.LevyDeclarationOps
 import uk.gov.bis.levyApiMock.models.LevyDeclarationResponse
@@ -17,7 +17,7 @@ class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, Auth
   extends Controller {
 
   def levyDeclarations(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate]) =
-    AuthorizedAction("empref", empref.value, "read:apprenticeship-levy").async { implicit request =>
+    AuthorizedAction(empref.value).async { implicit request =>
      // Action.async { implicit request =>
 
       val dateRange = DateRange(fromDate, toDate)

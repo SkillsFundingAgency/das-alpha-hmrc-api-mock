@@ -34,10 +34,9 @@ class EmprefMongo @Inject()(val mongodb: ReactiveMongoApi) extends EmprefOps {
     } yield o
 
     of.map {
-      case Some(o) => println(Json.prettyPrint(o))
-        o.validate[EmprefResponse] match {
+      case Some(o) => o.validate[EmprefResponse] match {
         case JsSuccess(resp, _) => Some(resp)
-        case JsError(errs) => println(errs);None
+        case JsError(errs) => None
       }
       case _ => None
     }

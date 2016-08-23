@@ -1,22 +1,24 @@
-package uk.gov.bis.levyApiMock.api
+package uk.gov.bis.levyApiMock.actions
 
+import cats.data.OptionT
+import cats.std.future._
 import com.google.inject.Inject
-import uk.gov.bis.levyApiMock.data.levy.GatewayUserOps
-import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}
+import uk.gov.bis.levyApiMock.data.levy.GatewayUserOps
+import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRequest[+A](authRecord: AuthRecord, request: Request[A]) extends WrappedRequest(request)
 
-class AuthorizedActionBuilder(identifierType: String, taxId: String, scope: String, authRecords: AuthRecordOps, enrolments: GatewayUserOps)(implicit ec: ExecutionContext)
+class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users: GatewayUserOps)(implicit ec: ExecutionContext)
   extends ActionBuilder[AuthRequest] {
   override def invokeBlock[A](request: Request[A], next: (AuthRequest[A]) => Future[Result]): Future[Result] = {
     val BearerToken = "Bearer (.+)".r
 
     request.headers.get("Authorization") match {
-      case Some(BearerToken(accessToken)) => validateToken(accessToken, identifierType, taxId, scope).flatMap {
+      case Some(BearerToken(accessToken)) => validateToken(accessToken, empref).flatMap {
         case Some(authRecord) => next(AuthRequest(authRecord, request))
         case None => unauthorized("Bearer token does not grant access to the requested resource")
       }
@@ -25,14 +27,20 @@ class AuthorizedActionBuilder(identifierType: String, taxId: String, scope: Stri
     }
   }
 
-  def validateToken[A](accessToken: String, identifierType: String, taxId: String, scope: String): Future[Option[AuthRecord]] =
-    authRecords.find(accessToken, identifierType, taxId, scope)
+  def validateToken[A](accessToken: String, empref: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = {
+    for {
+      ar <- OptionT(authRecords.find(accessToken))
+      u <- OptionT(users.forGatewayID(ar.gatewayID))
+    } yield ar
+  }.value
 
   private def unauthorized(message: String): Future[Result] = Future.successful(Unauthorized(message))
 }
 
 
 class AuthorizedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayUserOps)(implicit ec: ExecutionContext) {
-  def apply(identifierType: String, taxId: String, scope: String): AuthorizedActionBuilder =
-    new AuthorizedActionBuilder(identifierType, taxId, scope, authRecords, enrolments)(ec)
+  def apply(empref: String): AuthorizedActionBuilder =
+    new AuthorizedActionBuilder(empref, authRecords, enrolments)(ec)
+
+
 }

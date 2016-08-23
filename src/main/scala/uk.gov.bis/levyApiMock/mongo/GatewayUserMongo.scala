@@ -16,7 +16,7 @@ class GatewayUserMongo @Inject()(val mongodb: ReactiveMongoApi) extends GatewayU
 
   def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection]("gateway_users"))
 
-  override def forGatewayId(gatewayId: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = {
+  override def forGatewayID(gatewayId: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = {
     val of = for {
       collection <- collectionF
       o <- collection.find(Json.obj("gatewayID" -> gatewayId)).cursor[JsObject]().collect[List](1).map(_.headOption)

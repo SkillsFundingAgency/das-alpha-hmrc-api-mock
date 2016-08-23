@@ -6,9 +6,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRecord(
                        accessToken: String,
-                       scope: String,
-                       gatewayId: String,
-                       clientId: String,
+                       gatewayID: String,
+                       clientID: String,
                        expiresAt: Long,
                        createdAt: Long
                      ) {
@@ -16,19 +15,11 @@ case class AuthRecord(
 }
 
 trait AuthRecordOps {
-  def all()(implicit ec: ExecutionContext): Future[Seq[AuthRecord]]
-
   def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
-  def find(accessToken: String, identifierType: String, taxId: String, scope: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+  def find(accessToken: String, empref: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
 
   def clearExpired()(implicit ec: ExecutionContext): Future[Unit]
 
-  def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
-
-  def create(records: Seq[AuthRecord])(implicit ec: ExecutionContext): Future[Unit]
-
   def expire(token: String)(implicit ec: ExecutionContext): Future[Int]
-
-  def scopes(token:String)(implicit ec: ExecutionContext): Future[Seq[String]]
 }
