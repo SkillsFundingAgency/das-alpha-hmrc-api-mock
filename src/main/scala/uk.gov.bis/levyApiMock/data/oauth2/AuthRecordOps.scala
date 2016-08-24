@@ -8,9 +8,10 @@ case class AuthRecord(
                        accessToken: String,
                        gatewayID: String,
                        clientID: String,
-                       expiresAt: Long,
+                       expiresIn: Long,
                        createdAt: Long
                      ) {
+  val expiresAt = createdAt+expiresIn
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
 }
 

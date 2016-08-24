@@ -16,7 +16,7 @@ class AuthenticatedActionBuilder(authRecords: AuthRecordOps)(implicit ec: Execut
     request.headers.get("Authorization") match {
       case Some(BearerToken(accessToken)) => validateToken(accessToken).flatMap {
         case Some(authRecord) => next(AuthRequest(authRecord, request))
-        case None => unauthorized("Bearer token is not valid")
+        case None => unauthorized(s"Bearer token ($accessToken) is not valid")
       }
       case Some(h) => unauthorized("Authorization header should be a Bearer token")
       case None => unauthorized("No Authorization header found")

@@ -22,11 +22,8 @@ resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
 libraryDependencies ++= Seq(
   "uk.gov.hmrc" %% "domain" % "3.5.0",
-  "com.typesafe.play" %% "play-slick" % "2.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
-  "org.postgresql" % "postgresql" % "9.4.1208",
   "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.typelevel" %% "cats" % "0.4.0",
+  "org.typelevel" %% "cats" % "0.6.1",
   "com.github.nscala-time" %% "nscala-time" % "2.12.0",
   "org.reactivemongo" %% "reactivemongo" % "0.11.14",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
