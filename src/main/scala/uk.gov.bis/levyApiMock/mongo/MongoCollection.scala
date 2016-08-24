@@ -2,13 +2,18 @@ package uk.gov.bis.levyApiMock.mongo
 
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
+import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MongoCollection[T] {
-  def collectionF(implicit ec: ExecutionContext): Future[JSONCollection]
+  def mongodb: ReactiveMongoApi
+
+  def collectionName: String
+
+  def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection](collectionName))
 
   def findOne(params: (String, JsValueWrapper)*)(implicit ec: ExecutionContext, reads: Reads[T]): Future[Option[T]] = {
     val selector = Json.obj(params: _*)
