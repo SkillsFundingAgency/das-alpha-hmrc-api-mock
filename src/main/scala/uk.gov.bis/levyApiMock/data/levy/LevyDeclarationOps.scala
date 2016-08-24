@@ -1,7 +1,5 @@
 package uk.gov.bis.levyApiMock.data.levy
 
-import uk.gov.bis.levyApiMock.models.LevyDeclarationResponse
-
 import scala.concurrent.{ExecutionContext, Future}
 
 

@@ -9,7 +9,7 @@ class Module extends AbstractModule {
     bind(classOf[EmprefOps]).to(classOf[EmprefMongo])
     bind(classOf[LevyDeclarationOps]).to(classOf[LevyDeclarationMongo])
     bind(classOf[AuthRecordOps]).to(classOf[AuthRecordMongo])
-    bind(classOf[FractionsOps]).to(classOf[DummyFractions])
+    bind(classOf[FractionsOps]).to(classOf[FractionMongo])
     bind(classOf[GatewayUserOps]).to(classOf[GatewayUserMongo])
   }
 

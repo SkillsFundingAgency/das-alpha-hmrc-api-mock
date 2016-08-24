@@ -5,8 +5,7 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import uk.gov.bis.levyApiMock.actions.AuthorizedAction
-import uk.gov.bis.levyApiMock.data.levy.EmprefOps
-import uk.gov.bis.levyApiMock.mongo._
+import uk.gov.bis.levyApiMock.data.levy._
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext

@@ -17,10 +17,4 @@ case class AuthRecord(
 
 trait AuthRecordOps {
   def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
-
-  def find(accessToken: String, empref: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
-
-  def clearExpired()(implicit ec: ExecutionContext): Future[Unit]
-
-  def expire(token: String)(implicit ec: ExecutionContext): Future[Int]
 }

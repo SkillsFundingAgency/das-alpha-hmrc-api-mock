@@ -7,8 +7,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.actions.AuthorizedAction
 import uk.gov.bis.levyApiMock.controllers.DateRange
-import uk.gov.bis.levyApiMock.data.levy.LevyDeclarationOps
-import uk.gov.bis.levyApiMock.models.LevyDeclarationResponse
+import uk.gov.bis.levyApiMock.data.levy.{LevyDeclarationOps, LevyDeclarationResponse}
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext

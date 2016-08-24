@@ -1,4 +1,4 @@
-package uk.gov.bis.levyApiMock.models
+package uk.gov.bis.levyApiMock.data.levy
 
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{LocalDate, LocalDateTime}
