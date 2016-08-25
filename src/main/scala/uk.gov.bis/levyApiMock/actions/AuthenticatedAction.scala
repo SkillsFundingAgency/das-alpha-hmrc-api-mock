@@ -1,10 +1,10 @@
 package uk.gov.bis.levyApiMock.actions
 
 import com.google.inject.Inject
-import uk.gov.bis.levyApiMock.data.levy.GatewayUserOps
-import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}
+import uk.gov.bis.levyApiMock.data.GatewayUserOps
+import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 

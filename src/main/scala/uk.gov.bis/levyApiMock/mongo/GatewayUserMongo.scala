@@ -4,9 +4,9 @@ import javax.inject._
 
 import play.api.libs.json.Json
 import play.modules.reactivemongo._
-import uk.gov.bis.levyApiMock.data.levy._
+import uk.gov.bis.levyApiMock.data.{GatewayUser, GatewayUserOps}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class GatewayUserMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[GatewayUser] with GatewayUserOps {
 
@@ -16,5 +16,7 @@ class GatewayUserMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCol
 
   override def forGatewayID(gatewayId: String)(implicit ec: ExecutionContext) = findOne("gatewayID" -> gatewayId)
 
-  override def forEmpref(empref: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = findOne("empref" -> empref)
+  override def forEmpref(empref: String)(implicit ec: ExecutionContext) = findOne("empref" -> empref)
+
+  override def validate(gatewayID: String, password: String)(implicit ec: ExecutionContext) = findOne("gatewayID" -> gatewayID, "password" -> password)
 }

@@ -5,7 +5,7 @@ import cats.std.future._
 import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}
-import uk.gov.bis.levyApiMock.data.levy.GatewayUserOps
+import uk.gov.bis.levyApiMock.data.GatewayUserOps
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}

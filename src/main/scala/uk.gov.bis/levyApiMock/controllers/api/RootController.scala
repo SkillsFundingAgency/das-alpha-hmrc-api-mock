@@ -5,7 +5,8 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import uk.gov.bis.levyApiMock.actions.AuthenticatedAction
-import uk.gov.bis.levyApiMock.data.levy.{GatewayUserOps, Href}
+import uk.gov.bis.levyApiMock.data.GatewayUserOps
+import uk.gov.bis.levyApiMock.data.levy.Href
 
 import scala.concurrent.ExecutionContext
 

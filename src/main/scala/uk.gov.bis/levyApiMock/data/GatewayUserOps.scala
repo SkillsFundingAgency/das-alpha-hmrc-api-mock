@@ -1,4 +1,4 @@
-package uk.gov.bis.levyApiMock.data.levy
+package uk.gov.bis.levyApiMock.data
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -8,4 +8,6 @@ trait GatewayUserOps {
   def forGatewayID(gatewayID: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]]
 
   def forEmpref(empref: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]]
+
+  def validate(gatewayID: String, password: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]]
 }

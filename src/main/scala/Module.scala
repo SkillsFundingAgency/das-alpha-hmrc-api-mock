@@ -1,4 +1,5 @@
 import com.google.inject.AbstractModule
+import uk.gov.bis.levyApiMock.data.GatewayUserOps
 import uk.gov.bis.levyApiMock.data.levy._
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 import uk.gov.bis.levyApiMock.mongo._
