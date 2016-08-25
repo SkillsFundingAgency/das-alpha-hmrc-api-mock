@@ -1,7 +1,7 @@
 package uk.gov.bis.levyApiMock.actions
 
 import cats.data.OptionT
-import cats.std.future._
+import cats.instances.future._
 import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}

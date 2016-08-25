@@ -4,11 +4,10 @@ import java.util.Date
 import javax.inject.Inject
 
 import cats.data.OptionT
-import cats.std.future._
+import cats.instances.future._
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
 import uk.gov.bis.levyApiMock.data._
 
 import scala.concurrent.{ExecutionContext, Future}
