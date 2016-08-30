@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.data.{GatewayUser, GatewayUserOps}
-import uk.gov.bis.levyApiMock.TaxServiceConfig.config
+import uk.gov.bis.levyApiMock.Config.config.taxservice
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,7 +21,7 @@ class GatewayUserAction @Inject()(gatewayUsers: GatewayUserOps)(implicit ec: Exe
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, GatewayUserRequest[A]]] = {
     implicit val rh: RequestHeader = request
-    val uri = config.baseURI + "/gateway/sign-in"
+    val uri = taxservice.baseURI + "/gateway/sign-in"
     val redirectToSignIn = Left(Redirect("").addingToSession(continueKey -> request.uri))
 
     request.session.get(sessionKey) match {

@@ -30,4 +30,8 @@ trait MongoCollection[T] {
       case _ => None
     }
   }
+
+  def remove(params: (String, JsValueWrapper)*)(implicit ec: ExecutionContext): Future[Unit] = {
+    collectionF.map(coll => coll.remove(Json.obj(params: _*)))
+  }
 }

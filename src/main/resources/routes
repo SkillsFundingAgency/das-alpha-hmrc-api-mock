@@ -11,4 +11,4 @@ GET         /apprenticeship-levy/                                  uk.gov.bis.le
 
 POST        /oauth/token                                           uk.gov.bis.levyApiMock.controllers.security.OAuth2Controller.accessToken
 GET         /oauth/authorize                                       uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorize(scope:Option[String], client_id:String, redirect_uri :String, state:Option[String])
-GET         /oauth/grantscope                                      uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id:String)
+GET         /oauth/grantscope                                      uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id: Long)

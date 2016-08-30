@@ -3,26 +3,28 @@ package uk.gov.bis.levyApiMock.controllers.security
 import javax.inject.{Inject, Singleton}
 
 import play.api.Logger
-import play.api.mvc.{AnyContent, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import uk.gov.bis.levyApiMock.actions._
 import uk.gov.bis.levyApiMock.auth.generateToken
-import uk.gov.bis.levyApiMock.data.AuthCodeOps
+import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthId, AuthIdOps}
 import views.html.helper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes: AuthCodeOps)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(GatewayAction: GatewayUserAction, authCodes: AuthCodeOps, authIds: AuthIdOps)(implicit ec: ExecutionContext) extends Controller {
 
   /**
     * Handle the initial oAuth request
     */
-  def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = GatewayAction.async { implicit request =>
-    Logger.debug("authorize")
+  def authorize(scope: Option[String], clientId: String, redirectUri: String, state: Option[String]) = Action.async { implicit request =>
     scope match {
       case Some(s) =>
-        createAuthCode(s, clientId, redirectUri, state, request).map { url =>
-          Redirect(url).removingFromSession(GatewayAction.sessionKey)
+        authIds.stash(AuthId(s, clientId, redirectUri, state)).map { id =>
+          Logger.debug(s"stashed with id %id")
+          val show = routes.GrantScopeController.show(id)
+          Logger.debug(s"redirecting to ${show.url}")
+          Redirect(show)
         }
       case None => Future.successful(BadRequest("missing scope"))
     }
