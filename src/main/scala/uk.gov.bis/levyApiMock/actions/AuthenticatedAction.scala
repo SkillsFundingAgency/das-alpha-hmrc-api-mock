@@ -3,12 +3,11 @@ package uk.gov.bis.levyApiMock.actions
 import com.google.inject.Inject
 import play.api.mvc.Results._
 import play.api.mvc.{ActionBuilder, _}
-import uk.gov.bis.levyApiMock.data.GatewayUserOps
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedActionBuilder(authRecords: AuthRecordOps)(implicit ec: ExecutionContext)
+class AuthenticatedAction @Inject()(authRecords: AuthRecordOps)(implicit ec: ExecutionContext)
   extends ActionBuilder[AuthRequest] {
   override def invokeBlock[A](request: Request[A], next: (AuthRequest[A]) => Future[Result]): Future[Result] = {
     val BearerToken = "Bearer (.+)".r
@@ -29,6 +28,3 @@ class AuthenticatedActionBuilder(authRecords: AuthRecordOps)(implicit ec: Execut
 }
 
 
-class AuthenticatedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayUserOps)(implicit ec: ExecutionContext) {
-  def apply(): AuthenticatedActionBuilder = new AuthenticatedActionBuilder(authRecords)(ec)
-}

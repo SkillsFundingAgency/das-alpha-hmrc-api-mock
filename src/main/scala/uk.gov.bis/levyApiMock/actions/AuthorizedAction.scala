@@ -41,6 +41,4 @@ class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users:
 class AuthorizedAction @Inject()(authRecords: AuthRecordOps, enrolments: GatewayUserOps)(implicit ec: ExecutionContext) {
   def apply(empref: String): AuthorizedActionBuilder =
     new AuthorizedActionBuilder(empref, authRecords, enrolments)(ec)
-
-
 }

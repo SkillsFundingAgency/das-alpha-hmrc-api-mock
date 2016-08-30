@@ -28,7 +28,7 @@ object Token {
 /**
   * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
   */
-class APIDataHandler @Inject()(applications: ApplicationOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
+class APIDataHandler @Inject()(applications: ClientOps, accessTokens: AccessTokenOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")
@@ -97,7 +97,9 @@ class APIDataHandler @Inject()(applications: ApplicationOps, accessTokens: Acces
     Logger.debug("find auth info by code")
     for {
       token <- OptionT(authCodes.find(code))
+      _ = Logger.debug(token.toString)
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayId))
+      _ = Logger.debug(user.toString)
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 

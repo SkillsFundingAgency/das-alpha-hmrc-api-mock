@@ -18,7 +18,7 @@ class RootController @Inject()(users: GatewayUserOps, authenticatedAction: Authe
 
   implicit def rootW = Json.writes[RootResponse]
 
-  def root = authenticatedAction().async { request =>
+  def root = authenticatedAction.async { request =>
     users.forGatewayID(request.authRecord.gatewayID).map {
       case Some(user) => Ok(Json.toJson(RootResponse(Map(), Seq(user.empref))))
       case _ => NotFound

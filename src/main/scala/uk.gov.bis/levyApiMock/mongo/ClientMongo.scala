@@ -5,15 +5,14 @@ import javax.inject.Inject
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
-import uk.gov.bis.levyApiMock.data.{ApplicationOps, AuthCodeRow}
+import uk.gov.bis.levyApiMock.data.{Application, ClientOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationMongo @Inject()(val mongodb: ReactiveMongoApi) extends ApplicationOps {
-  implicit val fmt = Json.format[AuthCodeRow]
+class ClientMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[Application] with ClientOps {
+  implicit val fmt = Json.format[Application]
 
-  def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection]("applications"))
+  override def collectionName: String = "applications"
 
   override def validate(id: String, secret: Option[String], grantType: String)(implicit ec: ExecutionContext): Future[Boolean] = {
     for {
@@ -21,4 +20,6 @@ class ApplicationMongo @Inject()(val mongodb: ReactiveMongoApi) extends Applicat
       o <- coll.find(Json.obj("clientID" -> id, "clientSecret" -> secret)).cursor[JsObject]().collect[List](1).map(_.nonEmpty)
     } yield o
   }
+
+  override def forId(clientID: String)(implicit ec: ExecutionContext): Future[Option[Application]] = findOne("clientID" -> clientID)
 }
