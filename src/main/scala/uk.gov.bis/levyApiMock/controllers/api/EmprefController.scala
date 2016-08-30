@@ -19,7 +19,6 @@ class EmprefController @Inject()(emprefs: EmprefOps, AuthorizedAction: Authorize
 
   def empref(empref: EmpRef) =
     AuthorizedAction(empref.value).async { implicit request =>
-      //  Action.async { implicit request =>
       emprefs.forEmpref(empref.value).map {
         case Some(resp) => Ok(Json.toJson(resp))
         case None => NotFound

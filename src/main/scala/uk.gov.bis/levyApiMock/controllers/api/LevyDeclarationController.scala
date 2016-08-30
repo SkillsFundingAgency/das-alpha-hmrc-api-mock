@@ -15,20 +15,25 @@ import scala.concurrent.ExecutionContext
 class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext)
   extends Controller {
 
+  implicit class LevyDeclarationsSyntax(resp: LevyDeclarationResponse) {
+    def filter(dateRange: DateRange): LevyDeclarationResponse = {
+      val filtered = resp.declarations.filter(d => dateRange.contains(d.submissionTime.toLocalDate))
+      resp.copy(declarations = filtered)
+    }
+
+    def sort: LevyDeclarationResponse = {
+      val sorted = resp.declarations.sortBy(_.id).reverse
+      resp.copy(declarations = sorted)
+    }
+  }
+
   def levyDeclarations(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate]) =
     AuthorizedAction(empref.value).async { implicit request =>
-     // Action.async { implicit request =>
-
       val dateRange = DateRange(fromDate, toDate)
       declarations.byEmpref(empref.value).map {
-        case Some(decls) => Ok(Json.toJson(filterByDate(decls, dateRange)))
+        case Some(decls) => Ok(Json.toJson(decls.filter(dateRange).sort))
         case None => NotFound
       }
     }
-
-  def filterByDate(decls: LevyDeclarationResponse, dateRange: DateRange): LevyDeclarationResponse = {
-    val filtered = decls.declarations.filter(d => dateRange.contains(d.submissionTime.toLocalDate))
-    decls.copy(declarations = filtered)
-  }
 
 }

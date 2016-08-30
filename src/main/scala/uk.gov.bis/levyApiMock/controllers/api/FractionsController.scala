@@ -14,6 +14,18 @@ import scala.concurrent.ExecutionContext
 
 class FractionsController @Inject()(fractionOps: FractionsOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
 
+  implicit class FractionResponseSyntax(resp: FractionResponse) {
+    def filter(dateRange: DateRange): FractionResponse = {
+      val filtered = resp.fractionCalculations.filter(f => dateRange.contains(f.calculatedAt))
+      resp.copy(fractionCalculations = filtered)
+    }
+
+    def sort: FractionResponse = {
+      val sorted = resp.fractionCalculations.sortBy(_.calculatedAt.toDate.getTime).reverse
+      resp.copy(fractionCalculations = sorted)
+    }
+  }
+
   implicit val fractionW = Json.writes[Fraction]
   implicit val fractionCalcW = Json.writes[FractionCalculation]
   implicit val fractionRepsonseW = Json.writes[FractionResponse]
@@ -22,13 +34,10 @@ class FractionsController @Inject()(fractionOps: FractionsOps, AuthorizedAction:
     AuthorizedAction(empref.value).async { implicit request =>
       val dateRange = DateRange(fromDate, toDate)
       fractionOps.byEmpref(empref.value).map {
-        case Some(fs) => Ok(Json.toJson(filterByDate(fs, dateRange)))
+        case Some(fs) => Ok(Json.toJson(fs.filter(dateRange).sort))
         case None => NotFound
       }
     }
 
-  def filterByDate(resp: FractionResponse, dateRange: DateRange): FractionResponse = {
-    val filtered = resp.fractionCalculations.filter(f => dateRange.contains(f.calculatedAt))
-    resp.copy(fractionCalculations = filtered)
-  }
+
 }
