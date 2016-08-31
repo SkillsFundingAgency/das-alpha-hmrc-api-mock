@@ -32,7 +32,7 @@ object Token {
 class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordOps, authCodes: AuthCodeOps, gatewayUsers: GatewayUserOps)(implicit ec: ExecutionContext) extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
-    Logger.debug("validate client")
+    Logger.trace("validate client")
     request.clientCredential match {
       case Some(cred) => applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
@@ -40,7 +40,7 @@ class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordO
   }
 
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
-    Logger.debug("create access token")
+    Logger.trace("create access token")
     val accessTokenExpiresIn = 60L * 60L // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
@@ -53,7 +53,7 @@ class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordO
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
-    Logger.debug("refresh access token")
+    Logger.trace("refresh access token")
     val accessTokenExpiresIn = Some(60L * 60L) // 1 hour
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
@@ -72,7 +72,7 @@ class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordO
   }
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by refresh token")
+    Logger.trace("find auth info by refresh token")
     for {
       at <- OptionT(authRecords.forRefreshToken(refreshToken))
       u <- OptionT(gatewayUsers.forGatewayID(at.gatewayID))
@@ -81,36 +81,36 @@ class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordO
 
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
-    Logger.debug("get stored access token using AuthInfo")
-    OptionT(authRecords.find(authInfo.user.gatewayID, authInfo.clientId)).map { auth =>
-      AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
+    Logger.trace("get stored access token using AuthInfo")
+    OptionT(authRecords.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
+      AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), new Date(token.createdAt))
     }
   }.value
 
   override def findAccessToken(token: String): Future[Option[AccessToken]] = {
-    Logger.debug("find access token by String")
+    Logger.trace("find access token by String")
     OptionT(authRecords.forAccessToken(token)).map { auth =>
       AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
     }
   }.value
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by code")
+    Logger.trace("find auth info by code")
     for {
       token <- OptionT(authCodes.find(code))
-      _ = Logger.debug(token.toString)
+      _ = Logger.trace(token.toString)
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayId))
-      _ = Logger.debug(user.toString)
+      _ = Logger.trace(user.toString)
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
   override def deleteAuthCode(code: String): Future[Unit] = {
-    Logger.debug("delete auth code")
+    Logger.trace("delete auth code")
     authCodes.delete(code).map(_ => ())
   }
 
   override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by access token")
+    Logger.trace("find auth info by access token")
     for {
       token <- OptionT(authRecords.forAccessToken(accessToken.token))
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayID))
@@ -119,7 +119,7 @@ class APIDataHandler @Inject()(applications: ClientOps, authRecords: AuthRecordO
 
 
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayUser]] = {
-    Logger.debug("find user by AuthorizationRequest")
+    Logger.trace("find user by AuthorizationRequest")
     OptionT.fromOption(request.clientCredential).flatMap {
       cred =>
         OptionT(gatewayUsers.forGatewayID(cred.clientId)).filter {

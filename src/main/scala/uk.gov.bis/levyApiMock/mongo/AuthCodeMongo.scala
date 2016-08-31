@@ -2,7 +2,6 @@ package uk.gov.bis.levyApiMock.mongo
 
 import javax.inject.Inject
 
-import play.api.Logger
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
@@ -25,7 +24,6 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollec
   }
 
   override def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String)(implicit ec: ExecutionContext): Future[Int] = {
-    Logger.debug("create auth code entry")
     val row = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some("read:apprenticeship-levy"), Some(clientId), 3600)
     for {
       coll <- collectionF
