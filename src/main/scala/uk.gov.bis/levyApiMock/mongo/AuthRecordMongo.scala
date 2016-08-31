@@ -4,15 +4,37 @@ import javax.inject.Inject
 
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.play.json._
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthRecordMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[AuthRecord] with AuthRecordOps {
 
-  implicit val authRecordR = Json.reads[AuthRecord]
+  implicit val authRecordF = Json.format[AuthRecord]
 
-  override val collectionName = "auth_records"
+  override val collectionName = "sys_auth_records"
 
   override def find(accessToken: String)(implicit ec: ExecutionContext) = findOne("accessToken" -> accessToken)
+
+  override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext) = findOne("refreshToken" -> refreshToken)
+
+  override def forAccessToken(accessToken: String)(implicit ec: ExecutionContext) = findOne("accessToken" -> accessToken)
+
+  override def find(gatewayID: String, clientId: Option[String])(implicit ec: ExecutionContext) = findOne("gatewayID" -> gatewayID, "clientID" -> clientId)
+
+  override def create(auth: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
+    for {
+      collection <- collectionF
+      r <- collection.insert(auth)
+    } yield ()
+  }
+
+  override def deleteExistingAndCreate(auth: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
+    for {
+      coll <- collectionF
+      _ <- coll.remove(Json.obj("accessToken" -> auth.accessToken))
+      _ <- coll.insert(auth)
+    } yield ()
+  }
 }

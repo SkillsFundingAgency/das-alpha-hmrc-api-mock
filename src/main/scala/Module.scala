@@ -12,7 +12,6 @@ class Module extends AbstractModule {
     bind(classOf[AuthRecordOps]).to(classOf[AuthRecordMongo])
     bind(classOf[FractionsOps]).to(classOf[FractionMongo])
     bind(classOf[GatewayUserOps]).to(classOf[GatewayUserMongo])
-    bind(classOf[AccessTokenOps]).to(classOf[AccessTokenMongo])
     bind(classOf[AuthCodeOps]).to(classOf[AuthCodeMongo])
     bind(classOf[AuthRequestOps]).to(classOf[AuthRequestMongo])
     bind(classOf[ClientOps]).to(classOf[ClientMongo])

@@ -6,15 +6,26 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRecord(
                        accessToken: String,
+                       refreshToken: Option[String],
                        gatewayID: String,
-                       clientID: String,
+                       scope: Option[String],
                        expiresIn: Long,
-                       createdAt: Long
-                     ) {
-  val expiresAt = createdAt+expiresIn
+                       createdAt: Long,
+                       clientID: String) {
+  val expiresAt = createdAt + expiresIn
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
 }
 
 trait AuthRecordOps {
+  def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+
+  def forAccessToken(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+
   def find(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+
+  def find(gatewayId: String, clientId: Option[String])(implicit ec: ExecutionContext): Future[Option[AuthRecord]]
+
+  def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
+
+  def deleteExistingAndCreate(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 }
