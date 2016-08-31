@@ -28,7 +28,7 @@ class RootController @Inject()(users: GatewayUserOps, authenticatedAction: Authe
     import views.html.helper.urlEncode
     Map(
       "self" -> Href("/"),
-      "empref" -> Href(s"/epaye/${urlEncode(empref)}")
+      empref -> Href(s"/epaye/${urlEncode(empref)}")
     )
   }
 }
