@@ -14,7 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ClaimAuthController @Inject()(scopes: ScopeOps, authCodes: AuthCodeOps, authIds: AuthIdOps, clients: ClientOps)(implicit ec: ExecutionContext) extends Controller {
 
-  def orError[A](ao: Option[A], err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
+  implicit class ErrorSyntax[A](ao: Option[A]) {
+    def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
+  }
 
   /**
     * Handle the initial oAuth request
@@ -22,8 +24,8 @@ class ClaimAuthController @Inject()(scopes: ScopeOps, authCodes: AuthCodeOps, au
   def authorize(scopeName: String, clientId: String, redirectUri: String, state: Option[String]) = Action.async {
     implicit request =>
       val authIdOrError = for {
-        _ <- XorT(clients.forId(clientId).map(c => orError(c, "unknown client id")))
-        _ <- XorT(scopes.byName(scopeName).map(s => orError(s, "unknown scope")))
+        _ <- XorT(clients.forId(clientId).map(_.orError("unknown client id")))
+        _ <- XorT(scopes.byName(scopeName).map(_.orError("unknown scope")))
       } yield AuthId(scopeName, clientId, redirectUri, state)
 
 
