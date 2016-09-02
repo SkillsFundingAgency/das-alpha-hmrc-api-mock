@@ -1,30 +1,15 @@
 package uk.gov.bis.levyApiMock.actions
 
 import com.google.inject.Inject
-import play.api.mvc.Results._
-import play.api.mvc.{ActionBuilder, _}
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedAction @Inject()(authRecords: AuthRecordOps)(implicit ec: ExecutionContext)
-  extends ActionBuilder[AuthRequest] {
-  override def invokeBlock[A](request: Request[A], next: (AuthRequest[A]) => Future[Result]): Future[Result] = {
-    val BearerToken = "Bearer (.+)".r
+class AuthenticatedAction @Inject()(authRecords: AuthRecordOps)(implicit val ec: ExecutionContext)
+  extends AuthAction {
 
-    request.headers.get("Authorization") match {
-      case Some(BearerToken(accessToken)) => validateToken(accessToken).flatMap {
-        case Some(authRecord) => next(AuthRequest(authRecord, request))
-        case None => unauthorized(s"Bearer token ($accessToken) is not valid")
-      }
-      case Some(h) => unauthorized("Authorization header should be a Bearer token")
-      case None => unauthorized("No Authorization header found")
-    }
-  }
+  override def validateToken(accessToken: String): Future[Option[AuthRecord]] = authRecords.find(accessToken)
 
-  def validateToken[A](accessToken: String): Future[Option[AuthRecord]] = authRecords.find(accessToken)
-
-  private def unauthorized(message: String): Future[Result] = Future.successful(Unauthorized(message))
 }
 
 
