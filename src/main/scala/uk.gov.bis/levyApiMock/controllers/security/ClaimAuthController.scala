@@ -12,7 +12,7 @@ import uk.gov.bis.levyApiMock.data._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClaimAuthController @Inject()(scopes: ScopeOps, authCodes: AuthCodeOps, authIds: AuthRequestOps, clients: ClientOps)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, clients: ClientOps)(implicit ec: ExecutionContext) extends Controller {
 
   implicit class ErrorSyntax[A](ao: Option[A]) {
     def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
