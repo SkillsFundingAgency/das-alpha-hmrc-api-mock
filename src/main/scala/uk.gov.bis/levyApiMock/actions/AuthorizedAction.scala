@@ -7,6 +7,9 @@ import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * an AuthorizedAction must both have a valid access token and that token must allow access to the given empref
+  */
 class AuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserOps)(implicit executionContext: ExecutionContext) {
   def apply(empref: String): AuthAction = new AuthorizedActionBuilder(empref, authRecords, users)
 }

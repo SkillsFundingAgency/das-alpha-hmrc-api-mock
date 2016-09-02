@@ -5,6 +5,10 @@ import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * An AuthenticatedAction checks that the access token is valid and provides the corresponding AuthRecord
+  * to the action body
+  */
 class AuthenticatedAction @Inject()(authRecords: AuthRecordOps)(implicit val ec: ExecutionContext)
   extends AuthAction {
 
