@@ -1,6 +1,7 @@
 package uk.gov.bis.levyApiMock.data.oauth2
 
 import org.joda.time.format.DateTimeFormat
+import uk.gov.bis.levyApiMock.data.MongoDate
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -10,9 +11,9 @@ case class AuthRecord(
                        gatewayID: String,
                        scope: Option[String],
                        expiresIn: Long,
-                       createdAt: Long,
+                       createdAt: MongoDate,
                        clientID: String) {
-  val expiresAt = createdAt + expiresIn
+  val expiresAt: Long = createdAt.longValue + expiresIn
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
 }
 
