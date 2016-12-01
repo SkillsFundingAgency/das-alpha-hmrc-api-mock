@@ -2,11 +2,12 @@ package uk.gov.bis.levyApiMock.mongo
 
 import javax.inject._
 
-import play.api.libs.json.Json
+import org.joda.time.LocalDate
+import play.api.libs.json.{Json, Reads}
 import play.modules.reactivemongo._
-import uk.gov.bis.levyApiMock.data.levy.{Fraction, FractionCalculation, FractionResponse, FractionsOps}
+import uk.gov.bis.levyApiMock.data.levy._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class FractionMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[FractionResponse] with FractionsOps {
 
@@ -18,4 +19,15 @@ class FractionMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollec
 
   override def byEmpref(empref: String)(implicit ec: ExecutionContext) = findOne("empref" -> empref)
 
+}
+
+class FractionCalcMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[FractionCalculationDate] with FractionCalcOps {
+  override def collectionName: String = "fraction_calculation_date"
+
+  implicit val jldReads = Reads.jodaLocalDateReads("yyyy-MM-dd")
+  implicit val fcReads = Json.reads[FractionCalculationDate]
+
+  override def lastCalculationDate(implicit ec: ExecutionContext): Future[Option[LocalDate]] = {
+    findOne().map(_.map(_.lastCalculationDate))
+  }
 }

@@ -2,8 +2,9 @@ package uk.gov.bis.levyApiMock
 
 import scala.util.{Failure, Success}
 
-case class Config(taxservice:TaxServiceConfig)
-case class TaxServiceConfig(baseURI:String)
+case class Config(taxservice: TaxServiceConfig)
+
+case class TaxServiceConfig(baseURI: String)
 
 object Config {
 

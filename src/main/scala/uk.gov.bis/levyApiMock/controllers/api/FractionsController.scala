@@ -3,16 +3,20 @@ package uk.gov.bis.levyApiMock.controllers.api
 import javax.inject._
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads, Writes}
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.actions.AuthorizedAction
 import uk.gov.bis.levyApiMock.controllers.DateRange
-import uk.gov.bis.levyApiMock.data.levy.{Fraction, FractionCalculation, FractionResponse, FractionsOps}
+import uk.gov.bis.levyApiMock.data.levy._
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext
 
-class FractionsController @Inject()(fractionOps: FractionsOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext) extends Controller {
+class FractionsController @Inject()(
+                                     fractionOps: FractionsOps,
+                                     fractionCalcOps: FractionCalcOps,
+                                     AuthorizedAction: AuthorizedAction
+                                   )(implicit exec: ExecutionContext) extends Controller {
 
   implicit class FractionResponseSyntax(resp: FractionResponse) {
     def filter(dateRange: DateRange): FractionResponse = {
@@ -38,6 +42,14 @@ class FractionsController @Inject()(fractionOps: FractionsOps, AuthorizedAction:
         case None => NotFound
       }
     }
+
+  def calculationDate = Action.async { implicit request =>
+    implicit val jldWrites = Writes.jodaLocalDateWrites("yyyy-MM-dd")
+    fractionCalcOps.lastCalculationDate.map {
+      case Some(d) => Ok(Json.toJson(d))
+      case None => NotFound
+    }
+  }
 
 
 }
