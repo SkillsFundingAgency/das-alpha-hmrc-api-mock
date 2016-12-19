@@ -2,7 +2,7 @@ package uk.gov.bis.levyApiMock.mongo
 
 import javax.inject.Inject
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
 import uk.gov.bis.levyApiMock.data.{Application, ClientOps}
@@ -15,10 +15,17 @@ class ClientMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollecti
   override def collectionName: String = "applications"
 
   override def validate(id: String, secret: Option[String], grantType: String)(implicit ec: ExecutionContext): Future[Boolean] = {
-    for {
+    val appO = for {
       coll <- collectionF
-      o <- coll.find(Json.obj("clientID" -> id, "clientSecret" -> secret)).cursor[JsObject]().collect[List](1).map(_.nonEmpty)
-    } yield o
+      app <- coll.find(Json.obj("clientID" -> id)).cursor[Application]().collect[List](1)
+    } yield app.headOption
+
+    appO.map {
+      case Some(app) =>
+        if (app.privilegedAccess) true
+        else secret.contains(app.clientSecret)
+      case None => false
+    }
   }
 
   override def forId(clientID: String)(implicit ec: ExecutionContext): Future[Option[Application]] = findOne("clientID" -> clientID)

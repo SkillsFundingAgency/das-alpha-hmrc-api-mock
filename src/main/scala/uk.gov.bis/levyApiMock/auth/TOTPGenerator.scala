@@ -40,7 +40,7 @@ object TimeWindow {
 case class TOTPCode(value: String) extends AnyVal
 
 trait TOTP {
-  def generateCode(secret: String, ts: Long): TOTPCode =
+  def generateCodeAtTime(secret: String, ts: Long): TOTPCode =
     generateCode(secret, TimeWindow.forTimestamp(ts))
 
   /**
