@@ -1,12 +1,20 @@
+
+
 name := """das-alpha-hmrc-api-mock"""
 
-lazy val `das-alpha-hmrc-api-mock` = (project in file("."))
-  .enablePlugins(PlayScala)
-  .disablePlugins(PlayLayoutPlugin)
-  .enablePlugins(GitVersioning)
-  .enablePlugins(GitBranchPrompt)
+enablePlugins(PlayScala)
+disablePlugins(PlayLayoutPlugin)
+
+enablePlugins(GitVersioning)
+enablePlugins(GitBranchPrompt)
 
 git.useGitDescribe := true
+
+enablePlugins(BuildInfoPlugin)
+
+buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
+buildInfoPackage := "uk.gov.bis.levyApiMock.buildinfo"
+buildInfoOptions ++= Seq(BuildInfoOption.ToJson, BuildInfoOption.BuildTime)
 
 routesImport ++= Seq(
   "uk.gov.hmrc.domain._",
