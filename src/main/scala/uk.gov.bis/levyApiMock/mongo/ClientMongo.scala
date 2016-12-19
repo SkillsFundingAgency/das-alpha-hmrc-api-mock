@@ -5,6 +5,7 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
+import uk.gov.bis.levyApiMock.auth.{TOTP, TOTPCode}
 import uk.gov.bis.levyApiMock.data.{Application, ClientOps}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,10 +23,14 @@ class ClientMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollecti
 
     appO.map {
       case Some(app) =>
-        if (app.privilegedAccess) true
+        if (app.privilegedAccess) secret.exists(checkPrivilegedAccess(_, app.clientSecret))
         else secret.contains(app.clientSecret)
       case None => false
     }
+  }
+
+  private def checkPrivilegedAccess(suppliedSecret: String, appSecret: String): Boolean = {
+    TOTP.generateCodesAround(appSecret, System.currentTimeMillis()).contains(TOTPCode(suppliedSecret))
   }
 
   override def forId(clientID: String)(implicit ec: ExecutionContext): Future[Option[Application]] = findOne("clientID" -> clientID)
