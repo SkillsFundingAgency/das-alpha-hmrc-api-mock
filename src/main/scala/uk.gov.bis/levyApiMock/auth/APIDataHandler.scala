@@ -51,7 +51,7 @@ class APIDataHandler @Inject()(
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
+    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, None)
 
     for {
       _ <- authRecords.create(auth)

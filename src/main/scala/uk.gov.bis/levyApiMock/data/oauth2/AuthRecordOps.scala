@@ -12,9 +12,11 @@ case class AuthRecord(
                        scope: Option[String],
                        expiresIn: Long,
                        createdAt: MongoDate,
-                       clientID: String) {
+                       clientID: String,
+                       privileged: Option[Boolean]) {
   val expiresAt: Long = createdAt.longValue + expiresIn
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
+  val isPrivileged: Boolean = privileged.getOrElse(false)
 }
 
 trait AuthRecordOps {
