@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.17.0",
   "uk.gov.hmrc" %% "domain" % "3.5.0",
   "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.typelevel" %% "cats-core" % "0.7.0",
+  "org.typelevel" %% "cats-core" % "0.8.1",
   "com.github.nscala-time" %% "nscala-time" % "2.12.0",
   "org.reactivemongo" %% "reactivemongo" % "0.11.14",
   "com.github.melrief" %% "pureconfig" % "0.1.6",

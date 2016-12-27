@@ -2,10 +2,8 @@ package uk.gov.bis.levyApiMock.controllers.security
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.Xor.{Left, Right}
-import cats.data.{Xor, XorT}
+import cats.data.EitherT
 import cats.instances.future._
-import cats.syntax.xor._
 import play.api.mvc.{Action, Controller}
 import uk.gov.bis.levyApiMock.data._
 
@@ -15,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, clients: ClientOps)(implicit ec: ExecutionContext) extends Controller {
 
   implicit class ErrorSyntax[A](ao: Option[A]) {
-    def orError(err: String): Xor[String, A] = ao.fold[Xor[String, A]](err.left)(a => a.right)
+    def orError(err: String): Either[String, A] = ao.fold[Either[String, A]](Left(err))(a => Right(a))
   }
 
   /**
@@ -24,8 +22,8 @@ class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, c
   def authorize(scopeName: String, clientId: String, redirectUri: String, state: Option[String]) = Action.async {
     implicit request =>
       val authIdOrError = for {
-        _ <- XorT(clients.forId(clientId).map(_.orError("unknown client id")))
-        _ <- XorT(scopes.byName(scopeName).map(_.orError("unknown scope")))
+        _ <- EitherT(clients.forId(clientId).map(_.orError("unknown client id")))
+        _ <- EitherT(scopes.byName(scopeName).map(_.orError("unknown scope")))
       } yield AuthRequest(scopeName, clientId, redirectUri, state)
 
 
