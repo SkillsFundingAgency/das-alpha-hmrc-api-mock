@@ -39,7 +39,9 @@ class APIDataHandler @Inject()(
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")
     request.clientCredential match {
-      case Some(cred) => applications.validate(cred.clientId, cred.clientSecret, request.grantType)
+      case Some(cred) =>
+        Logger.debug(cred.toString)
+        applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
     }
   }

@@ -79,7 +79,7 @@ trait TOTP {
 
 object TOTP extends TOTP
 
-object TOTPGenerator extends TOTP with App {
+object TOTPGenerator extends App {
   if (args.length < 1) println("Secret is missing.")
-  else println(generateCode(args(0), TimeWindow.forNow).value)
+  else println(TOTP.generateCode(args(0), TimeWindow.forNow).value)
 }
