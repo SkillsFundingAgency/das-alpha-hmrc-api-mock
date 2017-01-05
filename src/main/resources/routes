@@ -3,18 +3,18 @@
 # ~~~~
 
 # Routes for the API
-GET         /apprenticeship-levy/                                  uk.gov.bis.levyApiMock.controllers.api.RootController.root()
+GET         /apprenticeship-levy/                                 uk.gov.bis.levyApiMock.controllers.api.RootController.root()
 
 
-GET         /apprenticeship-levy/epaye/*empref/declarations        uk.gov.bis.levyApiMock.controllers.api.LevyDeclarationController.levyDeclarations(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate])
-GET         /apprenticeship-levy/epaye/*empref/fractions           uk.gov.bis.levyApiMock.controllers.api.FractionsController.fractions(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate])
-GET         /apprenticeship-levy/epaye/*empref                     uk.gov.bis.levyApiMock.controllers.api.EmprefController.empref(empref: EmpRef)
-GET         /apprenticeship-levy/fraction-calculation-date         uk.gov.bis.levyApiMock.controllers.api.FractionsController.calculationDate()
+GET         /apprenticeship-levy/*empref/declarations             uk.gov.bis.levyApiMock.controllers.api.LevyDeclarationController.levyDeclarations(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate])
+GET         /apprenticeship-levy/epaye/*empref/fractions          uk.gov.bis.levyApiMock.controllers.api.FractionsController.fractions(empref: EmpRef, fromDate: Option[LocalDate], toDate: Option[LocalDate])
+GET         /apprenticeship-levy/epaye/*empref                    uk.gov.bis.levyApiMock.controllers.api.EmprefController.empref(empref: EmpRef)
+GET         /apprenticeship-levy/fraction-calculation-date        uk.gov.bis.levyApiMock.controllers.api.FractionsController.calculationDate()
 
-POST        /oauth/token                                           uk.gov.bis.levyApiMock.controllers.security.OAuth2Controller.accessToken
-GET         /oauth/authorize                                       uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorize(scope: String, client_id:String, redirect_uri :String, state:Option[String])
-GET         /oauth/grantscope                                      uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id: Long)
+POST        /oauth/token                                          uk.gov.bis.levyApiMock.controllers.security.OAuth2Controller.accessToken
+GET         /oauth/authorize                                      uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorize(scope: String, client_id:String, redirect_uri :String, state:Option[String])
+GET         /oauth/grantscope                                     uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id: Long)
 
 # Health check
-GET         /ping                                                  uk.gov.bis.levyApiMock.controllers.HealthCheckController.ping()
-GET         /version                                               uk.gov.bis.levyApiMock.controllers.HealthCheckController.version()
+GET         /ping                                                 uk.gov.bis.levyApiMock.controllers.HealthCheckController.ping()
+GET         /version                                              uk.gov.bis.levyApiMock.controllers.HealthCheckController.version()
