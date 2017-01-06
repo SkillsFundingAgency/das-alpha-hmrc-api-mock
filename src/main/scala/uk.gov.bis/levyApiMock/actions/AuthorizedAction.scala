@@ -6,6 +6,7 @@ import play.api.Logger
 import uk.gov.bis.levyApiMock.data.GatewayUserOps
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 import cats.instances.future._
+import uk.gov.bis.levyApiMock.auth.OAuthTrace
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,11 +20,11 @@ class AuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserO
 
 class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users: GatewayUserOps)(implicit val ec: ExecutionContext) extends AuthAction {
   override def validateToken(accessToken: String): Future[Option[AuthRecord]] = {
-    Logger.debug(s"looking for auth record for access token $accessToken")
+    OAuthTrace(s"looking for auth record for access token $accessToken")
 
     for {
       ar <- OptionT(authRecords.find(accessToken))
-      _ = Logger.debug(s"found auth record $ar")
+      _ = OAuthTrace(s"found auth record $ar")
       hasAccess <- OptionT.liftF(checkAccess(ar)) if hasAccess
     } yield ar
   }.value

@@ -7,6 +7,7 @@ import cats.data.OptionT
 import cats.instances.future._
 import play.api.Logger
 import play.api.libs.json.Json
+import uk.gov.bis.levyApiMock.Config
 import uk.gov.bis.levyApiMock.data._
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
@@ -37,17 +38,17 @@ class APIDataHandler @Inject()(
   extends DataHandler[GatewayUser] {
 
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
-    Logger.debug("validate client")
+    OAuthTrace("validate client")
     request.clientCredential match {
       case Some(cred) =>
-        Logger.debug(cred.toString)
+        OAuthTrace(cred.toString)
         applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
     }
   }
 
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
-    Logger.debug("create access token")
+    OAuthTrace("create access token")
     val accessTokenExpiresIn = 60L * 60L
     // 1 hour
     val refreshToken = Some(generateToken)
@@ -62,7 +63,7 @@ class APIDataHandler @Inject()(
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
-    Logger.debug("refresh access token")
+    OAuthTrace("refresh access token")
     val accessTokenExpiresIn = Some(60L * 60L)
     // 1 hour
     val accessToken = generateToken
@@ -82,7 +83,7 @@ class APIDataHandler @Inject()(
   }
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by refresh token")
+    OAuthTrace("find auth info by refresh token")
     for {
       at <- OptionT(authRecords.forRefreshToken(refreshToken))
       u <- OptionT(gatewayUsers.forGatewayID(at.gatewayID))
@@ -91,36 +92,36 @@ class APIDataHandler @Inject()(
 
 
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
-    Logger.debug("get stored access token using AuthInfo")
+    OAuthTrace("get stored access token using AuthInfo")
     OptionT(authRecords.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
       AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), new Date(token.createdAt))
     }
   }.value
 
   override def findAccessToken(token: String): Future[Option[AccessToken]] = {
-    Logger.debug("find access token by String")
+    OAuthTrace("find access token by String")
     OptionT(authRecords.forAccessToken(token)).map { auth =>
       AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
     }
   }.value
 
   override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by code")
+    OAuthTrace("find auth info by code")
     for {
       token <- OptionT(authCodes.find(code))
-      _ = Logger.debug(token.toString)
+      _ = OAuthTrace(token.toString)
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayId))
-      _ = Logger.debug(user.toString)
+      _ = OAuthTrace(user.toString)
     } yield AuthInfo(user, token.clientId, token.scope, None)
   }.value
 
   override def deleteAuthCode(code: String): Future[Unit] = {
-    Logger.debug("delete auth code")
+    OAuthTrace("delete auth code")
     authCodes.delete(code).map(_ => ())
   }
 
   override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[GatewayUser]]] = {
-    Logger.debug("find auth info by access token")
+    OAuthTrace("find auth info by access token")
     for {
       token <- OptionT(authRecords.forAccessToken(accessToken.token))
       user <- OptionT(gatewayUsers.forGatewayID(token.gatewayID))
@@ -133,7 +134,7 @@ class APIDataHandler @Inject()(
     * case of Privileged Access
     */
   override def findUser(request: AuthorizationRequest): Future[Option[GatewayUser]] = {
-    Logger.debug("find user by AuthorizationRequest")
+    OAuthTrace("find user by AuthorizationRequest")
 
     for {
       cred <- OptionT.fromOption(request.clientCredential)

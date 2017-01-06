@@ -26,6 +26,11 @@ scalaVersion := "2.11.8"
 
 PlayKeys.devSettings := Seq("play.server.http.port" -> "9001")
 
+javaOptions := Seq(
+  "-Dconfig.file=src/main/resources/development.application.conf",
+  "-Dlogger.file=src/main/resources/development.logger.xml"
+)
+
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
 libraryDependencies ++= Seq(
