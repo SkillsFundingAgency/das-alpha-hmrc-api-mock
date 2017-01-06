@@ -2,8 +2,10 @@ package uk.gov.bis.levyApiMock.actions
 
 import cats.data.OptionT
 import com.google.inject.Inject
+import play.api.Logger
 import uk.gov.bis.levyApiMock.data.GatewayUserOps
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
+import cats.instances.future._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,12 +16,20 @@ class AuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserO
   def apply(empref: String): AuthAction = new AuthorizedActionBuilder(empref, authRecords, users)
 }
 
+
 class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users: GatewayUserOps)(implicit val ec: ExecutionContext) extends AuthAction {
   override def validateToken(accessToken: String): Future[Option[AuthRecord]] = {
-    import cats.instances.future._
+    Logger.debug(s"looking for auth record for access token $accessToken")
+
     for {
       ar <- OptionT(authRecords.find(accessToken))
-      u <- OptionT(users.forGatewayID(ar.gatewayID))
+      _ = Logger.debug(s"found auth record $ar")
+      hasAccess <- OptionT.liftF(checkAccess(ar)) if hasAccess
     } yield ar
   }.value
+
+  private def checkAccess(ar: AuthRecord): Future[Boolean] = {
+    if (ar.isPrivileged) Future.successful(true)
+    else users.forGatewayID(ar.gatewayID).map(_.exists(_.empref == empref))
+  }
 }

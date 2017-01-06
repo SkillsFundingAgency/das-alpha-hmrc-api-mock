@@ -39,7 +39,9 @@ class APIDataHandler @Inject()(
   override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
     Logger.debug("validate client")
     request.clientCredential match {
-      case Some(cred) => applications.validate(cred.clientId, cred.clientSecret, request.grantType)
+      case Some(cred) =>
+        Logger.debug(cred.toString)
+        applications.validate(cred.clientId, cred.clientSecret, request.grantType)
       case None => Future.successful(false)
     }
   }
@@ -51,7 +53,8 @@ class APIDataHandler @Inject()(
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get)
+    val privileged = authInfo.user == privilegedActionUser
+    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
 
     for {
       _ <- authRecords.create(auth)
