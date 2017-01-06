@@ -15,6 +15,9 @@ POST        /oauth/token                                          uk.gov.bis.lev
 GET         /oauth/authorize                                      uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorize(scope: String, client_id:String, redirect_uri :String, state:Option[String])
 GET         /oauth/grantscope                                     uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id: Long)
 
+GET         /test/generate-token                                  uk.gov.bis.levyApiMock.controllers.security.TestController.generateToken(secret: String, ts: Option[Long])
+GET         /test/check-token                                     uk.gov.bis.levyApiMock.controllers.security.TestController.checkToken(secret: String, token:String,  ts: Option[Long])
+
 # Health check
 GET         /ping                                                 uk.gov.bis.levyApiMock.controllers.HealthCheckController.ping()
 GET         /version                                              uk.gov.bis.levyApiMock.controllers.HealthCheckController.version()
