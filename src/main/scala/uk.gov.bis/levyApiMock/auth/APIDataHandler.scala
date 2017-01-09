@@ -48,14 +48,15 @@ class APIDataHandler @Inject()(
   }
 
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
-    OAuthTrace("create access token")
+    OAuthTrace(s"create access token for $authInfo")
     val accessTokenExpiresIn = 60L * 60L
     // 1 hour
     val refreshToken = Some(generateToken)
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val privileged = authInfo.user == privilegedActionUser
+    val privileged = authInfo.user.gatewayID == privilegedActionUser.gatewayID
     val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
+    OAuthTrace(s"new auth record is $auth")
 
     for {
       _ <- authRecords.create(auth)
