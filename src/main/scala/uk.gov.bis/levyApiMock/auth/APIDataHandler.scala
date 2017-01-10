@@ -7,7 +7,6 @@ import cats.data.OptionT
 import cats.instances.future._
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.bis.levyApiMock.Config
 import uk.gov.bis.levyApiMock.data._
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
@@ -47,18 +46,33 @@ class APIDataHandler @Inject()(
     }
   }
 
+  def isPrivileged(clientId: String): Future[Boolean] = applications.forId(clientId).map {
+    case Some(app) => app.privilegedAccess
+    case None => false
+  }
+
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
     OAuthTrace(s"create access token for $authInfo")
-    val accessTokenExpiresIn = 60L * 60L
     // 1 hour
     val refreshToken = Some(generateToken)
+    val accessTokenExpiresIn = 60L * 60L
     val accessToken = generateToken
     val createdAt = System.currentTimeMillis()
-    val privileged = authInfo.user.gatewayID == privilegedActionUser.gatewayID
-    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
-    OAuthTrace(s"new auth record is $auth")
+
+    def buildAuthRecord(privileged: Boolean): AuthRecord = {
+      AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
+    }
+
+    val privilegedF = authInfo.clientId.map { clientId =>
+      applications.forId(clientId).map {
+        case Some(app) => app.privilegedAccess
+        case None => false
+      }
+    }.getOrElse(Future.successful(false))
 
     for {
+      privileged <- privilegedF
+      auth = buildAuthRecord(privileged = privileged)
       _ <- authRecords.create(auth)
     } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
   }
