@@ -14,9 +14,11 @@ case class AuthRecord(
                        createdAt: MongoDate,
                        clientID: String,
                        privileged: Option[Boolean]) {
-  val expiresAt: Long = createdAt.longValue + expiresIn
+  val expiresAt: Long = createdAt.longValue + expiresIn * 1000L
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
   val isPrivileged: Boolean = privileged.getOrElse(false)
+
+  def accessTokenExpired(referenceTimeInMills: Long): Boolean = expiresAt > referenceTimeInMills
 }
 
 trait AuthRecordOps {
