@@ -2,7 +2,7 @@ package uk.gov.bis.levyApiMock.actions
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
-import uk.gov.bis.levyApiMock.data.GatewayUser
+import uk.gov.bis.levyApiMock.data.{GatewayUser, SystemTimeSource}
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,14 +29,14 @@ class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with Option
 
   "non-privileged user with right empref" should {
     "have access" in {
-      val sut = new AuthorizedActionBuilder(empref1, new DummyAuthRecords(records), new DummyGatewayUsers(users))(ExecutionContext.global)
+      val sut = new AuthorizedActionBuilder(empref1, new DummyAuthRecords(records), new DummyGatewayUsers(users), new SystemTimeSource)(ExecutionContext.global)
       sut.validateToken(nonPrivilegedToken).futureValue.value shouldBe nonPrivilegedAuthRecord
     }
   }
 
   "privileged user with other empref" should {
     "have access" in {
-      val sut = new AuthorizedActionBuilder(empref2, new DummyAuthRecords(records), new DummyGatewayUsers(users))(ExecutionContext.global)
+      val sut = new AuthorizedActionBuilder(empref2, new DummyAuthRecords(records), new DummyGatewayUsers(users), new SystemTimeSource)(ExecutionContext.global)
       sut.validateToken(privilegedToken).futureValue.value shouldBe privilegedAuthRecord
     }
   }

@@ -32,7 +32,9 @@ class APIDataHandler @Inject()(
                                 applications: ClientOps,
                                 authRecords: AuthRecordOps,
                                 authCodes: AuthCodeOps,
-                                gatewayUsers: GatewayUserOps)
+                                gatewayUsers: GatewayUserOps,
+                                timeSource: TimeSource
+                              )
                               (implicit ec: ExecutionContext)
   extends DataHandler[GatewayUser] {
 
@@ -57,7 +59,7 @@ class APIDataHandler @Inject()(
     val refreshToken = Some(generateToken)
     val accessTokenExpiresIn = 60L * 60L
     val accessToken = generateToken
-    val createdAt = System.currentTimeMillis()
+    val createdAt = timeSource.currentTimeMillis()
 
     def buildAuthRecord(privileged: Boolean): AuthRecord = {
       AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
@@ -79,17 +81,16 @@ class APIDataHandler @Inject()(
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
     OAuthTrace("refresh access token")
-    val accessTokenExpiresIn = Some(60L * 60L)
-    // 1 hour
-    val accessToken = generateToken
-    val createdAt = System.currentTimeMillis()
 
     authRecords.forRefreshToken(refreshToken).flatMap {
       case Some(authRecord) =>
+        val createdAt = timeSource.currentTimeMillis()
+        val expireInOneHour = Some(60L * 60L)
         val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), createdAt = createdAt)
         for {
           _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
-        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
+        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(createdAt))
+
       case None =>
         val s = s"Cannot find an access token entry with refresh token $refreshToken"
         Logger.warn(s)
@@ -160,7 +161,7 @@ class APIDataHandler @Inject()(
 
   private def checkPrivilegedAccess(cred: ClientCredential, app: Application): Boolean = {
     cred.clientSecret.exists { cs =>
-      TOTP.generateCodesAround(app.clientSecret, System.currentTimeMillis()).contains(TOTPCode(cs))
+      TOTP.generateCodesAround(app.clientSecret, timeSource.currentTimeMillis()).contains(TOTPCode(cs))
     }
   }
 }

@@ -5,11 +5,11 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
-import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow}
+import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow, TimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollection[AuthCodeRow] with AuthCodeOps {
+class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi, timeSource: TimeSource) extends MongoCollection[AuthCodeRow] with AuthCodeOps {
   implicit val fmt = Json.format[AuthCodeRow]
 
   override val collectionName: String = "sys_auth_codes"
@@ -24,7 +24,7 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCollec
   }
 
   override def create(code: String, gatewayUserId: String, redirectUri: String, clientId: String, scope: String)(implicit ec: ExecutionContext): Future[Int] = {
-    val row = AuthCodeRow(code, gatewayUserId, redirectUri, System.currentTimeMillis(), Some("read:apprenticeship-levy"), Some(clientId), 3600)
+    val row = AuthCodeRow(code, gatewayUserId, redirectUri, timeSource.currentTimeMillis(), Some("read:apprenticeship-levy"), Some(clientId), 3600)
     for {
       coll <- collectionF
       i <- coll.insert(row)
