@@ -86,9 +86,9 @@ class APIDataHandler @Inject()(
 
     authRecords.forRefreshToken(refreshToken).flatMap {
       case Some(authRecord) =>
-        val updatedRow = authRecord.copy(accessToken = accessToken, createdAt = createdAt)
+        val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), createdAt = createdAt)
         for {
-          _ <- authRecords.deleteExistingAndCreate(updatedRow)
+          _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
         } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
       case None =>
         val s = s"Cannot find an access token entry with refresh token $refreshToken"

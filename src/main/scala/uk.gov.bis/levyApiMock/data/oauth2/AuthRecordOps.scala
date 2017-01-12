@@ -32,5 +32,5 @@ trait AuthRecordOps {
 
   def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 
-  def deleteExistingAndCreate(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
+  def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 }
