@@ -21,8 +21,8 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
   val refreshtoken1 = "refreshtoken1"
   val clientsecret1 = "clientsecret1"
 
-  "accessToken" should {
-    "issue a new access token and refresh token" in {
+  "accessToken" can {
+    "handle a valid refresh_token request" should {
       val mockAuthRecords = new MockAuthRecords
 
       val dh = new APIDataHandler(DummyClients, mockAuthRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
@@ -35,19 +35,33 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
       )
 
       val result = controller.accessToken(request)
-      status(result) shouldBe OK
+
+      "return an OK status" in {
+        status(result) shouldBe OK
+      }
 
       val resultMap = contentAsJson(result).validate[Map[String, JsValue]].asOpt.value
       val deleteAuthRecord = mockAuthRecords.deletedAuthRecord.value
       val createdAuthRecord = mockAuthRecords.createdAuthRecord.value
 
-      resultMap.get("access_token").value shouldBe JsString(createdAuthRecord.accessToken)
-      resultMap.get("refresh_token").value shouldBe JsString(createdAuthRecord.refreshToken.value)
+      "return json containing the newly created access and refresh tokens" in {
+        resultMap.get("access_token").value shouldBe JsString(createdAuthRecord.accessToken)
+        resultMap.get("refresh_token").value shouldBe JsString(createdAuthRecord.refreshToken.value)
+      }
 
-      createdAuthRecord.accessToken shouldNot be(deleteAuthRecord.accessToken)
-      createdAuthRecord.refreshToken.value shouldNot be(deleteAuthRecord.refreshToken.value)
-      createdAuthRecord.clientID shouldBe clientid1
-      createdAuthRecord.gatewayID shouldBe user1
+      "delete the auth record with the supplied refresh token" in {
+        deleteAuthRecord.refreshToken.value shouldBe refreshtoken1
+      }
+
+      "create a new record with the same user id and client id as the old record" in {
+        createdAuthRecord.clientID shouldBe clientid1
+        createdAuthRecord.gatewayID shouldBe user1
+      }
+
+      "create new values for the access and refresh tokens" in {
+        createdAuthRecord.accessToken shouldNot be(deleteAuthRecord.accessToken)
+        createdAuthRecord.refreshToken.value shouldNot be(deleteAuthRecord.refreshToken.value)
+      }
     }
   }
 
