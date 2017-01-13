@@ -6,13 +6,12 @@ import play.api.libs.json.{JsString, JsValue}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.bis.levyApiMock.auth.APIDataHandler
-import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
+import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 import uk.gov.bis.levyApiMock.data.{Application, GatewayUser, MongoDate, SystemTimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
+class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
   val user1 = "user1"
@@ -24,9 +23,7 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
   "accessToken" can {
     "handle a valid refresh_token request" should {
       val mockAuthRecords = new MockAuthRecords
-
-      val dh = new APIDataHandler(DummyClients, mockAuthRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
-      val controller = new OAuth2Controller(dh)
+      val controller: OAuth2Controller = makeController(mockAuthRecords)
       val request = FakeRequest().withFormUrlEncodedBody(
         "grant_type" -> "refresh_token",
         "client_id" -> clientid1,
@@ -63,6 +60,55 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
         createdAuthRecord.refreshToken.value shouldNot be(deleteAuthRecord.refreshToken.value)
       }
     }
+
+    "reject an invalid refresh_token request" should {
+      "return 401 Unauthorised status if the client_id is unknown" in {
+        val request = FakeRequest().withFormUrlEncodedBody(
+          "grant_type" -> "refresh_token",
+          "client_id" -> "unknown",
+          "refresh_token" -> refreshtoken1,
+          "client_secret" -> clientsecret1
+        )
+
+        val controller = makeController()
+        val result = controller.accessToken(request)
+
+        status(result) shouldBe 401
+      }
+
+      "return 401 Unauthorised status if the client_secret is incorrect" in {
+        val request = FakeRequest().withFormUrlEncodedBody(
+          "grant_type" -> "refresh_token",
+          "client_id" -> clientid1,
+          "refresh_token" -> refreshtoken1,
+          "client_secret" -> "incorrect"
+        )
+
+        val controller = makeController()
+        val result = controller.accessToken(request)
+
+        status(result) shouldBe 401
+      }
+
+      "return 400 Bad Request status if the refresh_token is incorrect" in {
+        val request = FakeRequest().withFormUrlEncodedBody(
+          "grant_type" -> "refresh_token",
+          "client_id" -> clientid1,
+          "refresh_token" -> "incorrect",
+          "client_secret" -> clientsecret1
+        )
+
+        val controller = makeController()
+        val result = controller.accessToken(request)
+
+        status(result) shouldBe 400
+      }
+    }
+  }
+
+  private def makeController(authRecords: AuthRecordOps = new DummyAuthRecords) = {
+    val dh = new APIDataHandler(DummyClients, authRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
+    new OAuth2Controller(dh)
   }
 
   object DummyClients extends StubClientOps {
@@ -73,10 +119,7 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
     }
   }
 
-  class MockAuthRecords extends StubAuthRecordOps {
-    var createdAuthRecord: Option[AuthRecord] = None
-    var deletedAuthRecord: Option[AuthRecord] = None
-
+  class DummyAuthRecords extends StubAuthRecordOps {
     val records = Seq(
       AuthRecord(acesstoken1, Some(refreshtoken1), user1, None, 3600, MongoDate.fromLong(0), clientid1, Some(false))
     )
@@ -84,6 +127,15 @@ class OAuth2ControllerSpec extends WordSpecLike with Matchers with ScalaFutures 
     override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = {
       Future.successful(records.find(_.refreshToken === Some(refreshToken)))
     }
+
+    override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
+      Future.successful(())
+    }
+  }
+
+  class MockAuthRecords extends DummyAuthRecords {
+    var createdAuthRecord: Option[AuthRecord] = None
+    var deletedAuthRecord: Option[AuthRecord] = None
 
     override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
       deletedAuthRecord = Some(existing)
