@@ -18,7 +18,7 @@ class AuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserO
 
 class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users: GatewayUserOps, timeSource: TimeSource)(implicit val ec: ExecutionContext) extends AuthAction {
   override def validateToken(accessToken: String): Future[Option[AuthRecord]] = {
-    OAuthTrace(s"looking for auth record for access token $accessToken")
+    OAuthTrace(s"looking for auth record for access token `$accessToken`")
 
     for {
       ar <- OptionT(authRecords.find(accessToken)) if !ar.accessTokenExpired(timeSource.currentTimeMillis())

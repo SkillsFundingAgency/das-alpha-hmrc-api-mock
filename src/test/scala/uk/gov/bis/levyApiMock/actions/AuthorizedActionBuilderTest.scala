@@ -16,9 +16,9 @@ class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with Option
   private val testUser = GatewayUser(testUsername, "", empref1, None, None)
 
   private val nonPrivilegedToken = "12334567890"
-  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, testUsername, None, 0, System.currentTimeMillis(), "", Some(false))
+  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(false))
   private val privilegedToken = "0987654321"
-  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, testUsername, None, 0, System.currentTimeMillis(), "", Some(true))
+  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(true))
 
   val records = Map(
     nonPrivilegedToken -> nonPrivilegedAuthRecord,
