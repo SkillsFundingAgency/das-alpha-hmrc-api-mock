@@ -11,6 +11,15 @@ import uk.gov.bis.levyApiMock.data.{Application, GatewayUser, MongoDate, SystemT
 
 import scala.concurrent.{ExecutionContext, Future}
 
+case class RefreshTokenRequestParams(clientId: String, clientSecret: String, refreshToken: String) {
+  def toParams: Seq[(String, String)] = Seq(
+    "grant_type" -> "refresh_token",
+    "client_id" -> clientId,
+    "refresh_token" -> refreshToken,
+    "client_secret" -> clientSecret
+  )
+}
+
 class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
@@ -19,6 +28,8 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
   val clientid1 = "clientid1"
   val refreshtoken1 = "refreshtoken1"
   val clientsecret1 = "clientsecret1"
+
+  val validRequest = RefreshTokenRequestParams(clientid1, clientsecret1, refreshtoken1)
 
   "accessToken" can {
     "handle a valid refresh_token request" should {
@@ -63,43 +74,22 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
 
     "reject an invalid refresh_token request" should {
       "return 401 Unauthorised status if the client_id is unknown" in {
-        val request = FakeRequest().withFormUrlEncodedBody(
-          "grant_type" -> "refresh_token",
-          "client_id" -> "unknown",
-          "refresh_token" -> refreshtoken1,
-          "client_secret" -> clientsecret1
-        )
-
-        val controller = makeController()
-        val result = controller.accessToken(request)
+        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(clientId = "unknown").toParams: _*)
+        val result = makeController().accessToken(request)
 
         status(result) shouldBe 401
       }
 
       "return 401 Unauthorised status if the client_secret is incorrect" in {
-        val request = FakeRequest().withFormUrlEncodedBody(
-          "grant_type" -> "refresh_token",
-          "client_id" -> clientid1,
-          "refresh_token" -> refreshtoken1,
-          "client_secret" -> "incorrect"
-        )
-
-        val controller = makeController()
-        val result = controller.accessToken(request)
+        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(clientSecret = "incorrect").toParams: _*)
+        val result = makeController().accessToken(request)
 
         status(result) shouldBe 401
       }
 
       "return 400 Bad Request status if the refresh_token is incorrect" in {
-        val request = FakeRequest().withFormUrlEncodedBody(
-          "grant_type" -> "refresh_token",
-          "client_id" -> clientid1,
-          "refresh_token" -> "incorrect",
-          "client_secret" -> clientsecret1
-        )
-
-        val controller = makeController()
-        val result = controller.accessToken(request)
+        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(refreshToken = "incorrect").toParams:_*)
+        val result = makeController().accessToken(request)
 
         status(result) shouldBe 400
       }
@@ -121,7 +111,7 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
 
   class DummyAuthRecords extends StubAuthRecordOps {
     val records = Seq(
-      AuthRecord(acesstoken1, Some(refreshtoken1), user1, None, 3600, MongoDate.fromLong(0), clientid1, Some(false))
+      AuthRecord(acesstoken1, Some(refreshtoken1), Some(MongoDate.fromLong(System.currentTimeMillis())), user1, None, 3600, MongoDate.fromLong(System.currentTimeMillis()), clientid1, Some(false))
     )
 
     override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = {

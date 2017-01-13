@@ -62,7 +62,7 @@ class APIDataHandler @Inject()(
     val createdAt = timeSource.currentTimeMillis()
 
     def buildAuthRecord(privileged: Boolean): AuthRecord = {
-      AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
+      AuthRecord(accessToken, refreshToken, None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
     }
 
     val privilegedF = authInfo.clientId.map { clientId =>
@@ -76,20 +76,25 @@ class APIDataHandler @Inject()(
       privileged <- privilegedF
       auth = buildAuthRecord(privileged = privileged)
       _ <- authRecords.create(auth)
-    } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
+    } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.refreshedAt.map(_.longValue).getOrElse(createdAt)))
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
     OAuthTrace("refresh access token")
 
     authRecords.forRefreshToken(refreshToken).flatMap {
-      case Some(authRecord) =>
-        val createdAt = timeSource.currentTimeMillis()
+      case Some(authRecord) if !authRecord.refreshTokenExpired(timeSource.currentTimeMillis()) =>
+        val refreshedAt = timeSource.currentTimeMillis()
         val expireInOneHour = Some(60L * 60L)
-        val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), createdAt = createdAt)
+        val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), refreshedAt = Some(refreshedAt))
         for {
           _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
-        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(createdAt))
+        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(refreshedAt))
+
+      case Some(authRecord) =>
+        val s = s"Refresh token has expired"
+        Logger.warn(s"$s $authRecord")
+        throw new IllegalArgumentException(s)
 
       case None =>
         val s = s"Cannot find an access token entry with refresh token $refreshToken"
