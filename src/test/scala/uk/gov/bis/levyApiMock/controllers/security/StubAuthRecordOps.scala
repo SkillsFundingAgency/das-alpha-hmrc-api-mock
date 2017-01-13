@@ -1,10 +1,10 @@
-package uk.gov.bis.levyApiMock.actions
+package uk.gov.bis.levyApiMock.controllers.security
 
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StubAuthRecords extends AuthRecordOps {
+trait StubAuthRecordOps extends AuthRecordOps {
   override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = ???
 
   override def forAccessToken(accessToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = ???

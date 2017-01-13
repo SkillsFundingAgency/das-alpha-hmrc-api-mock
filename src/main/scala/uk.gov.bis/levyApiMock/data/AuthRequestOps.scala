@@ -2,7 +2,7 @@ package uk.gov.bis.levyApiMock.data
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthRequest(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Long = 0, creationDate: MongoDate = System.currentTimeMillis())
+case class AuthRequest(scope: String, clientId: String, redirectUri: String, state: Option[String], id: Long, creationDate: MongoDate)
 
 trait AuthRequestOps {
   /**

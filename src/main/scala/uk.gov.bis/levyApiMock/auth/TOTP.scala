@@ -7,6 +7,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 import org.apache.commons.codec.binary.Base32
+import uk.gov.bis.levyApiMock.data.{SystemTimeSource, TimeSource}
 
 import scala.math._
 
@@ -23,7 +24,7 @@ case class TimeWindow(value: Long) extends AnyVal {
 object TimeWindow {
   def forTimestamp(ts: Long): TimeWindow = TimeWindow(ts / 30000)
 
-  def forNow: TimeWindow = forTimestamp(System.currentTimeMillis())
+  def forNow(timeSource: TimeSource = new SystemTimeSource): TimeWindow = forTimestamp(timeSource.currentTimeMillis())
 
   /**
     * Generate three time windows  - one for the given timestamp and the

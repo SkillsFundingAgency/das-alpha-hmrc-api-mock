@@ -10,7 +10,7 @@ import uk.gov.bis.levyApiMock.data._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, clients: ClientOps)(implicit ec: ExecutionContext) extends Controller {
+class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, clients: ClientOps, timeSource: TimeSource)(implicit ec: ExecutionContext) extends Controller {
 
   implicit class ErrorSyntax[A](ao: Option[A]) {
     def orError(err: String): Either[String, A] = ao.fold[Either[String, A]](Left(err))(a => Right(a))
@@ -24,7 +24,7 @@ class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, c
       val authIdOrError = for {
         _ <- EitherT(clients.forId(clientId).map(_.orError("unknown client id")))
         _ <- EitherT(scopes.byName(scopeName).map(_.orError("unknown scope")))
-      } yield AuthRequest(scopeName, clientId, redirectUri, state)
+      } yield AuthRequest(scopeName, clientId, redirectUri, state, 0, MongoDate.fromLong(timeSource.currentTimeMillis()))
 
 
       authIdOrError.value.flatMap {

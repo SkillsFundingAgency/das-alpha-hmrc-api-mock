@@ -1,6 +1,7 @@
 package uk.gov.bis.levyApiMock.data.oauth2
 
 import org.joda.time.format.DateTimeFormat
+import uk.gov.bis.levyApiMock.auth.OAuthTrace
 import uk.gov.bis.levyApiMock.data.MongoDate
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,9 +15,11 @@ case class AuthRecord(
                        createdAt: MongoDate,
                        clientID: String,
                        privileged: Option[Boolean]) {
-  val expiresAt: Long = createdAt.longValue + expiresIn
+  val expiresAt: Long = createdAt.longValue + expiresIn * 1000L
   val expiresAtDateString: String = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss ZZ").print(expiresAt)
   val isPrivileged: Boolean = privileged.getOrElse(false)
+
+  def accessTokenExpired(referenceTimeInMills: Long): Boolean = expiresAt <= referenceTimeInMills
 }
 
 trait AuthRecordOps {
@@ -30,5 +33,5 @@ trait AuthRecordOps {
 
   def create(record: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 
-  def deleteExistingAndCreate(token: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
+  def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit]
 }

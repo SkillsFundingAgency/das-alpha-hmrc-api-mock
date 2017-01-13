@@ -7,7 +7,6 @@ import cats.data.OptionT
 import cats.instances.future._
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.bis.levyApiMock.Config
 import uk.gov.bis.levyApiMock.data._
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
@@ -33,7 +32,9 @@ class APIDataHandler @Inject()(
                                 applications: ClientOps,
                                 authRecords: AuthRecordOps,
                                 authCodes: AuthCodeOps,
-                                gatewayUsers: GatewayUserOps)
+                                gatewayUsers: GatewayUserOps,
+                                timeSource: TimeSource
+                              )
                               (implicit ec: ExecutionContext)
   extends DataHandler[GatewayUser] {
 
@@ -47,35 +48,49 @@ class APIDataHandler @Inject()(
     }
   }
 
+  def isPrivileged(clientId: String): Future[Boolean] = applications.forId(clientId).map {
+    case Some(app) => app.privilegedAccess
+    case None => false
+  }
+
   override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
     OAuthTrace(s"create access token for $authInfo")
-    val accessTokenExpiresIn = 60L * 60L
     // 1 hour
     val refreshToken = Some(generateToken)
+    val accessTokenExpiresIn = 60L * 60L
     val accessToken = generateToken
-    val createdAt = System.currentTimeMillis()
-    val privileged = authInfo.user.gatewayID == privilegedActionUser.gatewayID
-    val auth = AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
-    OAuthTrace(s"new auth record is $auth")
+    val createdAt = timeSource.currentTimeMillis()
+
+    def buildAuthRecord(privileged: Boolean): AuthRecord = {
+      AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
+    }
+
+    val privilegedF = authInfo.clientId.map { clientId =>
+      applications.forId(clientId).map {
+        case Some(app) => app.privilegedAccess
+        case None => false
+      }
+    }.getOrElse(Future.successful(false))
 
     for {
+      privileged <- privilegedF
+      auth = buildAuthRecord(privileged = privileged)
       _ <- authRecords.create(auth)
     } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
   }
 
   override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
     OAuthTrace("refresh access token")
-    val accessTokenExpiresIn = Some(60L * 60L)
-    // 1 hour
-    val accessToken = generateToken
-    val createdAt = System.currentTimeMillis()
 
     authRecords.forRefreshToken(refreshToken).flatMap {
       case Some(authRecord) =>
-        val updatedRow = authRecord.copy(accessToken = accessToken, createdAt = createdAt)
+        val createdAt = timeSource.currentTimeMillis()
+        val expireInOneHour = Some(60L * 60L)
+        val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), createdAt = createdAt)
         for {
-          _ <- authRecords.deleteExistingAndCreate(updatedRow)
-        } yield AccessToken(updatedRow.accessToken, Some(refreshToken), authInfo.scope, accessTokenExpiresIn, new Date(createdAt))
+          _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
+        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(createdAt))
+
       case None =>
         val s = s"Cannot find an access token entry with refresh token $refreshToken"
         Logger.warn(s)
@@ -146,7 +161,7 @@ class APIDataHandler @Inject()(
 
   private def checkPrivilegedAccess(cred: ClientCredential, app: Application): Boolean = {
     cred.clientSecret.exists { cs =>
-      TOTP.generateCodesAround(app.clientSecret, System.currentTimeMillis()).contains(TOTPCode(cs))
+      TOTP.generateCodesAround(app.clientSecret, timeSource.currentTimeMillis()).contains(TOTPCode(cs))
     }
   }
 }

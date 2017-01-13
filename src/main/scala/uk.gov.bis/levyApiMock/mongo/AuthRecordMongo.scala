@@ -5,6 +5,7 @@ import javax.inject.Inject
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json._
+import uk.gov.bis.levyApiMock.auth.OAuthTrace
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,11 +31,12 @@ class AuthRecordMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoColl
     } yield ()
   }
 
-  override def deleteExistingAndCreate(auth: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
+  override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
+    OAuthTrace(s"Removing ${existing.accessToken} and creating ${created.accessToken}")
     for {
       coll <- collectionF
-      _ <- coll.remove(Json.obj("accessToken" -> auth.accessToken))
-      _ <- coll.insert(auth)
+      _ <- coll.remove(Json.obj("accessToken" -> existing.accessToken))
+      _ <- coll.insert(created)
     } yield ()
   }
 }
