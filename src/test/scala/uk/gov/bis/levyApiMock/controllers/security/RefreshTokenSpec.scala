@@ -34,15 +34,7 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
   "accessToken" can {
     "handle a valid refresh_token request" should {
       val mockAuthRecords = new MockAuthRecords
-      val controller: OAuth2Controller = makeController(mockAuthRecords)
-      val request = FakeRequest().withFormUrlEncodedBody(
-        "grant_type" -> "refresh_token",
-        "client_id" -> clientid1,
-        "refresh_token" -> refreshtoken1,
-        "client_secret" -> clientsecret1
-      )
-
-      val result = controller.accessToken(request)
+      val result = accessToken(validRequest, mockAuthRecords)
 
       "return an OK status" in {
         status(result) shouldBe OK
@@ -87,12 +79,12 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
     }
   }
 
-  private def accessToken(requestParams: RefreshTokenRequestParams) = {
+  private def accessToken(requestParams: RefreshTokenRequestParams, authRecords:AuthRecordOps = new DummyAuthRecords) = {
     val request = FakeRequest().withFormUrlEncodedBody(requestParams.toParams: _*)
-    makeController().accessToken(request)
+    makeController(authRecords).accessToken(request)
   }
 
-  private def makeController(authRecords: AuthRecordOps = new DummyAuthRecords) = {
+  private def makeController(authRecords: AuthRecordOps) = {
     val dh = new APIDataHandler(DummyClients, authRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
     new OAuth2Controller(dh)
   }
