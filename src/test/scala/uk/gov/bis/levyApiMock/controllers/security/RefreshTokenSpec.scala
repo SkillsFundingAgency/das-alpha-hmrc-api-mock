@@ -6,30 +6,14 @@ import play.api.libs.json.{JsString, JsValue}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.bis.levyApiMock.auth.APIDataHandler
-import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
-import uk.gov.bis.levyApiMock.data.{Application, GatewayUser, MongoDate, SystemTimeSource}
+import uk.gov.bis.levyApiMock.data.SystemTimeSource
+import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 
-import scala.concurrent.{ExecutionContext, Future}
-
-case class RefreshTokenRequestParams(clientId: String, clientSecret: String, refreshToken: String) {
-  def toParams: Seq[(String, String)] = Seq(
-    "grant_type" -> "refresh_token",
-    "client_id" -> clientId,
-    "refresh_token" -> refreshToken,
-    "client_secret" -> clientSecret
-  )
-}
 
 class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
-  val user1 = "user1"
-  val acesstoken1 = "acesstoken1"
-  val clientid1 = "clientid1"
-  val refreshtoken1 = "refreshtoken1"
-  val clientsecret1 = "clientsecret1"
-
-  val validRequest = RefreshTokenRequestParams(clientid1, clientsecret1, refreshtoken1)
+  import RefreshTokenSpecTestData._
 
   "accessToken" can {
     "handle a valid refresh_token request" should {
@@ -79,7 +63,7 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
     }
   }
 
-  private def accessToken(requestParams: RefreshTokenRequestParams, authRecords:AuthRecordOps = new DummyAuthRecords) = {
+  private def accessToken(requestParams: RefreshTokenRequestParams, authRecords: AuthRecordOps = new DummyAuthRecords) = {
     val request = FakeRequest().withFormUrlEncodedBody(requestParams.toParams: _*)
     makeController(authRecords).accessToken(request)
   }
@@ -88,48 +72,6 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
     val dh = new APIDataHandler(DummyClients, authRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
     new OAuth2Controller(dh)
   }
-
-  object DummyClients extends StubClientOps {
-    val clients = Seq(Application("test", "appid1", clientid1, clientsecret1, "servertoken1", privilegedAccess = false))
-
-    override def forId(clientID: String)(implicit ec: ExecutionContext): Future[Option[Application]] = {
-      Future.successful(clients.find(_.clientID == clientID))
-    }
-  }
-
-  class DummyAuthRecords extends StubAuthRecordOps {
-    val records = Seq(
-      AuthRecord(acesstoken1, Some(refreshtoken1), Some(MongoDate.fromLong(System.currentTimeMillis())), user1, None, 3600, MongoDate.fromLong(System.currentTimeMillis()), clientid1, Some(false))
-    )
-
-    override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = {
-      Future.successful(records.find(_.refreshToken === Some(refreshToken)))
-    }
-
-    override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
-      Future.successful(())
-    }
-  }
-
-  class MockAuthRecords extends DummyAuthRecords {
-    var createdAuthRecord: Option[AuthRecord] = None
-    var deletedAuthRecord: Option[AuthRecord] = None
-
-    override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = {
-      deletedAuthRecord = Some(existing)
-      createdAuthRecord = Some(created)
-      Future.successful(())
-    }
-  }
-
-  object DummyAuthCodes extends StubAuthCodeOps
-
-  object DummyGatewayUsers extends StubGatewayUserOps {
-    val users = Seq(GatewayUser(user1, "password", "empref1", None, None))
-
-    override def forGatewayID(gatewayID: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = {
-      Future.successful(users.find(_.gatewayID === gatewayID))
-    }
-  }
-
 }
+
+
