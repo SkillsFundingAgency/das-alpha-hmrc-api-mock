@@ -1,7 +1,8 @@
 package uk.gov.bis.levyApiMock.controllers.security
 
+import uk.gov.bis.levyApiMock.data._
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
-import uk.gov.bis.levyApiMock.data.{Application, GatewayUser, MongoDate}
+import uk.gov.bis.levyApiMock.data.stubs.{StubAuthCodeOps, StubAuthRecordOps, StubClientOps, StubGatewayUserOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 

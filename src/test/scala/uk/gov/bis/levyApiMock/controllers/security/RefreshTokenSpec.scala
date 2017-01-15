@@ -1,6 +1,5 @@
 package uk.gov.bis.levyApiMock.controllers.security
 
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.libs.json.{JsString, JsValue}
 import play.api.test.FakeRequest
@@ -10,7 +9,7 @@ import uk.gov.bis.levyApiMock.data.SystemTimeSource
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 
 
-class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
+class RefreshTokenSpec extends WordSpecLike with Matchers with OptionValues {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
   import RefreshTokenSpecTestData._

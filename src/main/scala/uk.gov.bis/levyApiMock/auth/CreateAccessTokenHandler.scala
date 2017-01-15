@@ -18,28 +18,26 @@ trait CreateAccessTokenHandler {
   implicit def ec: ExecutionContext
 
   def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
-    OAuthTrace(s"create access token for $authInfo")
-    // 1 hour
-    val refreshToken = Some(generateToken)
-    val accessTokenExpiresIn = 60L * 60L
-    val accessToken = generateToken
-    val createdAt = timeSource.currentTimeMillis()
-
-    def buildAuthRecord(privileged: Boolean): AuthRecord = {
-      AuthRecord(accessToken, refreshToken, None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
-    }
-
-    val privilegedF = authInfo.clientId.map { clientId =>
-      applications.forId(clientId).map {
-        case Some(app) => app.privilegedAccess
-        case None => false
-      }
-    }.getOrElse(Future.successful(false))
-
     for {
-      privileged <- privilegedF
-      auth = buildAuthRecord(privileged = privileged)
+      privileged <- privilegedF(authInfo.clientId)
+      auth = buildAuthRecord(authInfo, privileged = privileged)
       _ <- authRecords.create(auth)
-    } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.refreshedAt.map(_.longValue).getOrElse(createdAt)))
+    } yield buildAccessToken(auth)
+  }
+
+  private def privilegedF(clientId: Option[String]): Future[Boolean] = clientId.map { clientId =>
+    applications.forId(clientId).map {
+      case Some(app) => app.privilegedAccess
+      case None => false
+    }
+  }.getOrElse(Future.successful(false))
+
+  private val accessTokenExpiresInOneHour: Long = 60L * 60L
+
+  private def buildAuthRecord(authInfo: AuthInfo[GatewayUser], privileged: Boolean): AuthRecord =
+    AuthRecord(generateToken, Some(generateToken), None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresInOneHour, timeSource.currentTimeMillis(), authInfo.clientId.get, Some(privileged))
+
+  private def buildAccessToken(auth: AuthRecord) = {
+    AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.refreshedAt.map(_.longValue).getOrElse(timeSource.currentTimeMillis())))
   }
 }

@@ -1,14 +1,13 @@
 package uk.gov.bis.levyApiMock.data
 
 import org.apache.commons.codec.binary.Base32
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.{AsyncWordSpecLike, Matchers, OptionValues}
 import uk.gov.bis.levyApiMock.auth.TOTP
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientOpsSpec extends WordSpecLike with Matchers with ScalaFutures with OptionValues {
+class ClientOpsSpec extends AsyncWordSpecLike with Matchers with OptionValues {
   val testTime = 9999L
   val timeSource = new TimeSource {
     override def currentTimeMillis() = testTime
@@ -19,11 +18,11 @@ class ClientOpsSpec extends WordSpecLike with Matchers with ScalaFutures with Op
   "validate" should {
     "handle privileged access client" in {
       val token = TOTP.generateCodeAtTime(testClientOps.paSecret, 0L)
-      testClientOps.validate(testClientOps.paClientID, Some(token.value), "").futureValue shouldBe true
+      testClientOps.validate(testClientOps.paClientID, Some(token.value), "").map(_ shouldBe true)
     }
 
     "handle non-privileged access client" in {
-      testClientOps.validate(testClientOps.nonPaClientID, Some(testClientOps.nonPaSecret), "").futureValue shouldBe true
+      testClientOps.validate(testClientOps.nonPaClientID, Some(testClientOps.nonPaSecret), "").map(_ shouldBe true)
     }
   }
 }

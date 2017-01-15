@@ -43,5 +43,6 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo" % "0.11.14",
   "com.github.melrief" %% "pureconfig" % "0.1.6",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % Test
+
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
