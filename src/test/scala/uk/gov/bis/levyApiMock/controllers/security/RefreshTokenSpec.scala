@@ -74,26 +74,22 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with ScalaFutures with
 
     "reject an invalid refresh_token request" should {
       "return 401 Unauthorised status if the client_id is unknown" in {
-        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(clientId = "unknown").toParams: _*)
-        val result = makeController().accessToken(request)
-
-        status(result) shouldBe 401
+        status(accessToken(validRequest.copy(clientId = "unknown"))) shouldBe 401
       }
 
       "return 401 Unauthorised status if the client_secret is incorrect" in {
-        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(clientSecret = "incorrect").toParams: _*)
-        val result = makeController().accessToken(request)
-
-        status(result) shouldBe 401
+        status(accessToken(validRequest.copy(clientSecret = "incorrect"))) shouldBe 401
       }
 
       "return 400 Bad Request status if the refresh_token is incorrect" in {
-        val request = FakeRequest().withFormUrlEncodedBody(validRequest.copy(refreshToken = "incorrect").toParams:_*)
-        val result = makeController().accessToken(request)
-
-        status(result) shouldBe 400
+        status(accessToken(validRequest.copy(refreshToken = "incorrect"))) shouldBe 400
       }
     }
+  }
+
+  private def accessToken(requestParams: RefreshTokenRequestParams) = {
+    val request = FakeRequest().withFormUrlEncodedBody(requestParams.toParams: _*)
+    makeController().accessToken(request)
   }
 
   private def makeController(authRecords: AuthRecordOps = new DummyAuthRecords) = {
