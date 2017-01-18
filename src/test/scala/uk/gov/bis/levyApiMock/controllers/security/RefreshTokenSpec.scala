@@ -2,11 +2,14 @@ package uk.gov.bis.levyApiMock.controllers.security
 
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.libs.json.{JsString, JsValue}
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.bis.levyApiMock.auth.APIDataHandler
+import uk.gov.bis.levyApiMock.auth.{APIDataHandler, RefreshAccessTokenHandler}
 import uk.gov.bis.levyApiMock.data.SystemTimeSource
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
+
+import scala.concurrent.Future
 
 
 class RefreshTokenSpec extends WordSpecLike with Matchers with OptionValues {
@@ -62,12 +65,12 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with OptionValues {
     }
   }
 
-  private def accessToken(requestParams: RefreshTokenRequestParams, authRecords: AuthRecordOps = new DummyAuthRecords) = {
+  private def accessToken(requestParams: RefreshTokenRequestParams, authRecords: AuthRecordOps = new DummyAuthRecords): Future[Result] = {
     val request = FakeRequest().withFormUrlEncodedBody(requestParams.toParams: _*)
     makeController(authRecords).accessToken(request)
   }
 
-  private def makeController(authRecords: AuthRecordOps) = {
+  private def makeController(authRecords: AuthRecordOps): OAuth2Controller = {
     val dh = new APIDataHandler(DummyClients, authRecords, DummyAuthCodes, DummyGatewayUsers, new SystemTimeSource)
     new OAuth2Controller(dh)
   }
