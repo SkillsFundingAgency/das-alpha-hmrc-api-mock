@@ -19,16 +19,16 @@ class RootController @Inject()(users: GatewayUserOps, authenticatedAction: Authe
 
   def root = authenticatedAction.async { request =>
     users.forGatewayID(request.authRecord.gatewayID).map {
-      case Some(user) => Ok(Json.toJson(RootResponse(buildLinks(user.empref), Seq(user.empref))))
+      case Some(user) => Ok(Json.toJson(RootResponse(buildLinks(user.empref), user.empref.toSeq)))
       case _ => NotFound
     }
   }
 
-  def buildLinks(empref: String): Map[String, Href] = {
+  def buildLinks(empref: Option[String]): Map[String, Href] = {
     import views.html.helper.urlEncode
-    Map(
-      "self" -> Href("/"),
-      empref -> Href(s"/epaye/${urlEncode(empref)}")
-    )
+    Seq(
+      Some("self" -> Href("/")),
+      empref.map(e => e -> Href(s"/epaye/${urlEncode(e)}"))
+    ).flatten.toMap
   }
 }
