@@ -13,7 +13,7 @@ class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with Option
   private val empref2 = "321/XY12345"
 
   private val testUsername = "user"
-  private val testUser = GatewayUser(testUsername, "", empref1, None, None)
+  private val testUser = GatewayUser(testUsername, "", Some(empref1), None, None)
 
   private val nonPrivilegedToken = "12334567890"
   private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(false))
