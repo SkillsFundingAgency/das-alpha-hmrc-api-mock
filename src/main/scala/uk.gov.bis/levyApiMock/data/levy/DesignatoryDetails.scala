@@ -18,6 +18,8 @@ package uk.gov.bis.levyApiMock.data.levy
 
 import play.api.libs.json.Json
 
+import scala.language.implicitConversions
+
 case class HodName(nameLine1: Option[String] = None, nameLine2: Option[String] = None)
 
 case class HodTelephone(telephoneNumber: Option[String] = None, fax: Option[String] = None)

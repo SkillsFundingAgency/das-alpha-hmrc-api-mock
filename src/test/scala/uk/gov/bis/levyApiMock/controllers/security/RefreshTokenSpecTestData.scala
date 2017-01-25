@@ -60,7 +60,7 @@ object RefreshTokenSpecTestData {
   object DummyAuthCodes extends StubAuthCodeOps
 
   object DummyGatewayUsers extends StubGatewayUserOps {
-    val users = Seq(GatewayUser(user1, "password", "empref1", None, None))
+    val users = Seq(GatewayUser(user1, "password", Some("empref1"), None, None))
 
     override def forGatewayID(gatewayID: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = {
       Future.successful(users.find(_.gatewayID == gatewayID))

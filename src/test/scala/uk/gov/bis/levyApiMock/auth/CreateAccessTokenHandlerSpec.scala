@@ -14,7 +14,7 @@ class CreateAccessTokenHandlerSpec extends AsyncWordSpecLike with Matchers with 
 
   "createAccessToken" should {
     "create an AuthToken for a non-privileged user" in {
-      val authInfo = AuthInfo[GatewayUser](GatewayUser("", "", "", None, None), Some(nonPriviligedClientId), None, None)
+      val authInfo = AuthInfo[GatewayUser](GatewayUser("", "", None, None, None), Some(nonPriviligedClientId), None, None)
       val mockAuthRecords = new MockAuthRecords
       handler(mockAuthRecords).createAccessToken(authInfo).map { _ =>
         mockAuthRecords.createdRecord.value.clientID shouldBe nonPriviligedClientId
@@ -23,7 +23,7 @@ class CreateAccessTokenHandlerSpec extends AsyncWordSpecLike with Matchers with 
     }
 
     "create an AuthToken for a privileged user" in {
-      val authInfo = AuthInfo[GatewayUser](GatewayUser("", "", "", None, None), Some(priviligedClientId), None, None)
+      val authInfo = AuthInfo[GatewayUser](GatewayUser("", "", None, None, None), Some(priviligedClientId), None, None)
       val mockAuthRecords = new MockAuthRecords
       handler(mockAuthRecords).createAccessToken(authInfo).map { _ =>
         mockAuthRecords.createdRecord.value.clientID shouldBe priviligedClientId
