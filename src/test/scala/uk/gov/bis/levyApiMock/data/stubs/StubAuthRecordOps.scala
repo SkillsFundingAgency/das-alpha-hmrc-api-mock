@@ -17,3 +17,5 @@ trait StubAuthRecordOps extends AuthRecordOps {
 
   override def deleteExistingAndCreate(existing: AuthRecord, created: AuthRecord)(implicit ec: ExecutionContext): Future[Unit] = ???
 }
+
+object StubAuthRecordOps extends StubAuthRecordOps

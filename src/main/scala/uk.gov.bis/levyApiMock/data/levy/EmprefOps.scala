@@ -11,3 +11,5 @@ case class EmprefResponse(_links: Map[String, Href], empref: String, employer: E
 trait EmprefOps {
   def forEmpref(empref: String)(implicit ec: ExecutionContext): Future[Option[EmprefResponse]]
 }
+
+

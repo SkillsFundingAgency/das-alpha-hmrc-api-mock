@@ -29,6 +29,6 @@ class AuthorizedActionBuilder(empref: String, authRecords: AuthRecordOps, users:
 
   private def checkAccess(ar: AuthRecord): Future[Boolean] = {
     if (ar.isPrivileged) Future.successful(true)
-    else users.forGatewayID(ar.gatewayID).map(_.exists(_.empref == empref))
+    else users.forGatewayID(ar.gatewayID).map(_.exists(_.empref.contains(empref)))
   }
 }

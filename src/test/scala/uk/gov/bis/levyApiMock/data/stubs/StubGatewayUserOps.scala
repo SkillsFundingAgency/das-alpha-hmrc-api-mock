@@ -11,3 +11,6 @@ trait StubGatewayUserOps extends GatewayUserOps{
 
   override def validate(gatewayID: String, password: String)(implicit ec: ExecutionContext): Future[Option[GatewayUser]] = ???
 }
+
+
+object StubGatewayUserOps extends StubGatewayUserOps

@@ -1,0 +1,97 @@
+/*
+ * Copyright 2016 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.bis.levyApiMock.data.levy
+
+import play.api.libs.json.Json
+
+case class HodName(nameLine1: Option[String] = None, nameLine2: Option[String] = None)
+
+case class HodTelephone(telephoneNumber: Option[String] = None, fax: Option[String] = None)
+
+case class HodEmail(primary: Option[String] = None)
+
+case class HodAddress(addressLine1: Option[String] = None,
+                      addressLine2: Option[String] = None,
+                      addressLine3: Option[String] = None,
+                      addressLine4: Option[String] = None,
+                      addressLine5: Option[String] = None,
+                      postcode: Option[String] = None,
+                      foreignCountry: Option[String] = None
+                     )
+
+case class HodContact(telephone: Option[HodTelephone] = None, email: Option[HodEmail] = None)
+
+case class DesignatoryDetailsData(name: Option[HodName] = None, address: Option[HodAddress] = None, contact: Option[HodContact] = None)
+
+case class DesignatoryDetails(empref: Option[String], employer: Option[DesignatoryDetailsData] = None, communication: Option[DesignatoryDetailsData] = None)
+
+case class DesignatoryDetailsLinks(employer: Option[String], communication: Option[String])
+
+case class HodDesignatoryDetailsLinks(links: Option[DesignatoryDetailsLinks])
+
+object DesignatoryDetails {
+  implicit val hnformat = Json.format[HodName]
+  implicit val haformat = Json.format[HodAddress]
+  implicit val htformat = Json.format[HodTelephone]
+  implicit val heformat = Json.format[HodEmail]
+  implicit val hcformat = Json.format[HodContact]
+  implicit val dddformat = Json.format[DesignatoryDetailsData]
+  implicit val ddlformat = Json.format[DesignatoryDetailsLinks]
+
+  implicit val readDesignatoryDetailsFormat = Json.reads[DesignatoryDetails]
+  implicit val writeDesignatoryDetailsFormat = Json.writes[DesignatoryDetails]
+  implicit val readDesignatoryDetailsLinksFormat = Json.reads[HodDesignatoryDetailsLinks]
+  implicit val writeDesignatoryDetailsLinksFormat = Json.writes[HodDesignatoryDetailsLinks]
+
+  def main(args: Array[String]): Unit = {
+    implicit def toOpt[T](t: T): Option[T] = Some(t)
+
+    val d = DesignatoryDetails(
+      "123/AB12345",
+      DesignatoryDetailsData(
+        HodName("employer name line 1", "employer name line 2"),
+        HodAddress(
+          "employer address line 1",
+          "employer address line 2",
+          "employer address line 3",
+          "employer address line 4",
+          "employer address line 5",
+          "employer postcode",
+          "employer foreign country"
+        ),
+        HodContact(HodTelephone("employer phone number"), HodEmail("employer email address"))
+      ),
+      DesignatoryDetailsData(
+        HodName("communication name line 1", "communication name line 2"),
+        HodAddress(
+          "communication address line 1",
+          "communication address line 2",
+          "communication address line 3",
+          "communication address line 4",
+          "communication address line 5",
+          "communication postcode",
+          "communication foreign country"
+        ),
+        HodContact(HodTelephone("communication phone number"), HodEmail("communication email address"))
+      )
+    )
+
+    println(Json.prettyPrint(Json.toJson(d)))
+  }
+}
+
+
