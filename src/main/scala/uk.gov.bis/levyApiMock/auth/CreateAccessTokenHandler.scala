@@ -32,10 +32,10 @@ trait CreateAccessTokenHandler {
     }
   }.getOrElse(Future.successful(false))
 
-  private val accessTokenExpiresInOneHour: Long = 60L * 60L
+  private val accessTokenExpiresInFourHours: Long = 4L * 60L * 60L
 
   private def buildAuthRecord(authInfo: AuthInfo[GatewayUser], privileged: Boolean): AuthRecord =
-    AuthRecord(generateToken, Some(generateToken), None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresInOneHour, timeSource.currentTimeMillis(), authInfo.clientId.get, Some(privileged))
+    AuthRecord(generateToken, Some(generateToken), None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresInFourHours, timeSource.currentTimeMillis(), authInfo.clientId.get, Some(privileged))
 
   private def buildAccessToken(auth: AuthRecord) = {
     AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.refreshedAt.map(_.longValue).getOrElse(timeSource.currentTimeMillis())))
