@@ -2,8 +2,8 @@ package uk.gov.bis.levyApiMock.controllers.api
 
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import uk.gov.bis.levyApiMock.actions.AuthenticatedAction
-import uk.gov.bis.levyApiMock.controllers.security.{StubAuthRecordOps, StubGatewayUserOps}
 import uk.gov.bis.levyApiMock.data.levy.Href
+import uk.gov.bis.levyApiMock.data.stubs.{StubAuthRecordOps, StubGatewayUserOps}
 import views.html.helper.urlEncode
 
 class RootControllerSpec extends WordSpecLike with Matchers with OptionValues {

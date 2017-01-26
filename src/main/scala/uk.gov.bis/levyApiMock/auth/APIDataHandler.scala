@@ -5,98 +5,28 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.instances.future._
-import play.api.Logger
-import play.api.libs.json.Json
 import uk.gov.bis.levyApiMock.data._
-import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
+import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider._
-
-case class ServiceBinding(service: String, identifierType: String, identifier: String)
-
-object ServiceBinding {
-  implicit val formats = Json.format[ServiceBinding]
-}
-
-case class Token(value: String, scopes: List[String], gatewayId: String, enrolments: List[ServiceBinding], clientId: String, expiresAt: Long)
-
-object Token {
-  implicit val formats = Json.format[Token]
-}
 
 /**
   * Provides the behaviours needed by the OAuth2Provider to create and retrieve access tokens
   */
 class APIDataHandler @Inject()(
-                                applications: ClientOps,
-                                authRecords: AuthRecordOps,
+                                val applications: ClientOps,
+                                val authRecords: AuthRecordOps,
                                 authCodes: AuthCodeOps,
                                 gatewayUsers: GatewayUserOps,
-                                timeSource: TimeSource
+                                val timeSource: TimeSource
                               )
-                              (implicit ec: ExecutionContext)
-  extends DataHandler[GatewayUser] {
+                              (implicit val ec: ExecutionContext)
+  extends DataHandler[GatewayUser]
+    with ValidateClientHandler
+    with CreateAccessTokenHandler
+    with RefreshAccessTokenHandler {
 
-  override def validateClient(request: AuthorizationRequest): Future[Boolean] = {
-    OAuthTrace("validate client")
-    request.clientCredential match {
-      case Some(cred) =>
-        OAuthTrace(cred.toString)
-        applications.validate(cred.clientId, cred.clientSecret, request.grantType)
-      case None => Future.successful(false)
-    }
-  }
-
-  def isPrivileged(clientId: String): Future[Boolean] = applications.forId(clientId).map {
-    case Some(app) => app.privilegedAccess
-    case None => false
-  }
-
-  override def createAccessToken(authInfo: AuthInfo[GatewayUser]): Future[AccessToken] = {
-    OAuthTrace(s"create access token for $authInfo")
-    // 1 hour
-    val refreshToken = Some(generateToken)
-    val accessTokenExpiresIn = 60L * 60L
-    val accessToken = generateToken
-    val createdAt = timeSource.currentTimeMillis()
-
-    def buildAuthRecord(privileged: Boolean): AuthRecord = {
-      AuthRecord(accessToken, refreshToken, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresIn, createdAt, authInfo.clientId.get, Some(privileged))
-    }
-
-    val privilegedF = authInfo.clientId.map { clientId =>
-      applications.forId(clientId).map {
-        case Some(app) => app.privilegedAccess
-        case None => false
-      }
-    }.getOrElse(Future.successful(false))
-
-    for {
-      privileged <- privilegedF
-      auth = buildAuthRecord(privileged = privileged)
-      _ <- authRecords.create(auth)
-    } yield AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
-  }
-
-  override def refreshAccessToken(authInfo: AuthInfo[GatewayUser], refreshToken: String): Future[AccessToken] = {
-    OAuthTrace("refresh access token")
-
-    authRecords.forRefreshToken(refreshToken).flatMap {
-      case Some(authRecord) =>
-        val createdAt = timeSource.currentTimeMillis()
-        val expireInOneHour = Some(60L * 60L)
-        val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), createdAt = createdAt)
-        for {
-          _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
-        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(createdAt))
-
-      case None =>
-        val s = s"Cannot find an access token entry with refresh token $refreshToken"
-        Logger.warn(s)
-        throw new IllegalArgumentException(s)
-    }
-  }
 
   override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[GatewayUser]]] = {
     OAuthTrace("find auth info by refresh token")
@@ -156,7 +86,6 @@ class APIDataHandler @Inject()(
       cred <- OptionT.fromOption(request.clientCredential)
       app <- OptionT(applications.forId(cred.clientId)) if checkPrivilegedAccess(cred, app)
     } yield privilegedActionUser
-
   }.value
 
   private def checkPrivilegedAccess(cred: ClientCredential, app: Application): Boolean = {

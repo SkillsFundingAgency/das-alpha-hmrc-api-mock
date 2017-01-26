@@ -1,4 +1,4 @@
-package uk.gov.bis.levyApiMock.controllers.security
+package uk.gov.bis.levyApiMock.data.stubs
 
 import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow}
 

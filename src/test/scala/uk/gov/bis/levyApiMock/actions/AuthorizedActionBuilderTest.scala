@@ -1,13 +1,12 @@
 package uk.gov.bis.levyApiMock.actions
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
-import uk.gov.bis.levyApiMock.data.{GatewayUser, SystemTimeSource}
+import org.scalatest.{AsyncWordSpecLike, Matchers, OptionValues}
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
+import uk.gov.bis.levyApiMock.data.{GatewayUser, SystemTimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with OptionValues with ScalaFutures {
+class AuthorizedActionBuilderTest extends AsyncWordSpecLike with Matchers with OptionValues {
 
   private val empref1 = "123/AB12345"
   private val empref2 = "321/XY12345"
@@ -16,9 +15,9 @@ class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with Option
   private val testUser = GatewayUser(testUsername, "", Some(empref1), None, None)
 
   private val nonPrivilegedToken = "12334567890"
-  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(false))
+  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(false))
   private val privilegedToken = "0987654321"
-  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(true))
+  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(true))
 
   val records = Map(
     nonPrivilegedToken -> nonPrivilegedAuthRecord,
@@ -30,14 +29,14 @@ class AuthorizedActionBuilderTest extends WordSpecLike with Matchers with Option
   "non-privileged user with right empref" should {
     "have access" in {
       val sut = new AuthorizedActionBuilder(empref1, new DummyAuthRecords(records), new DummyGatewayUsers(users), new SystemTimeSource)(ExecutionContext.global)
-      sut.validateToken(nonPrivilegedToken).futureValue.value shouldBe nonPrivilegedAuthRecord
+      sut.validateToken(nonPrivilegedToken).map(_.value shouldBe nonPrivilegedAuthRecord)
     }
   }
 
   "privileged user with other empref" should {
     "have access" in {
       val sut = new AuthorizedActionBuilder(empref2, new DummyAuthRecords(records), new DummyGatewayUsers(users), new SystemTimeSource)(ExecutionContext.global)
-      sut.validateToken(privilegedToken).futureValue.value shouldBe privilegedAuthRecord
+      sut.validateToken(privilegedToken).map(_.value shouldBe privilegedAuthRecord)
     }
   }
 }
