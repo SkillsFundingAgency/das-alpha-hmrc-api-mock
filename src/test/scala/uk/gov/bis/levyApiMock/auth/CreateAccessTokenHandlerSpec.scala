@@ -1,16 +1,15 @@
 package uk.gov.bis.levyApiMock.auth
 
 import org.scalatest.{AsyncWordSpecLike, Matchers, OptionValues}
+import uk.gov.bis.levyApiMock.data.CommonTestData._
 import uk.gov.bis.levyApiMock.data.oauth2.{AuthRecord, AuthRecordOps}
-import uk.gov.bis.levyApiMock.data.stubs.{StubAuthRecordOps, StubClientOps}
-import uk.gov.bis.levyApiMock.data.{Application, GatewayUser, TimeSource}
+import uk.gov.bis.levyApiMock.data.stubs.StubAuthRecordOps
+import uk.gov.bis.levyApiMock.data.{GatewayUser, TimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider.AuthInfo
 
 class CreateAccessTokenHandlerSpec extends AsyncWordSpecLike with Matchers with OptionValues  {
-  val nonPriviligedClientId = "non-privileged"
-  val priviligedClientId = "privileged"
 
   "createAccessToken" should {
     "create an AuthToken for a non-privileged user" in {
@@ -42,17 +41,6 @@ class CreateAccessTokenHandlerSpec extends AsyncWordSpecLike with Matchers with 
     }
 
     override implicit def ec = scala.concurrent.ExecutionContext.Implicits.global
-  }
-
-  object DummyClients extends StubClientOps {
-    val clients = Seq(
-      Application("test", "appid1", nonPriviligedClientId, "clientsecret1", "servertoken1", privilegedAccess = false),
-      Application("test", "appid2", priviligedClientId, "clientsecret2", "servertoken2", privilegedAccess = true)
-    )
-
-    override def forId(clientID: String)(implicit ec: ExecutionContext): Future[Option[Application]] = {
-      Future.successful(clients.find(_.clientID == clientID))
-    }
   }
 
   class MockAuthRecords extends StubAuthRecordOps {

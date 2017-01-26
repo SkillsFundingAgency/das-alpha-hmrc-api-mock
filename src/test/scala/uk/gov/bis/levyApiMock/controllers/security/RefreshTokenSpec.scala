@@ -15,7 +15,7 @@ import scala.concurrent.Future
 class RefreshTokenSpec extends WordSpecLike with Matchers with OptionValues {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
-  import RefreshTokenSpecTestData._
+  import uk.gov.bis.levyApiMock.data.CommonTestData._
 
   "accessToken" can {
     "handle a valid refresh_token request" should {
@@ -40,7 +40,7 @@ class RefreshTokenSpec extends WordSpecLike with Matchers with OptionValues {
       }
 
       "create a new record with the same user id and client id as the old record" in {
-        createdAuthRecord.clientID shouldBe clientid1
+        createdAuthRecord.clientID shouldBe nonPriviligedClientId
         createdAuthRecord.gatewayID shouldBe user1
       }
 
