@@ -13,6 +13,7 @@ GET         /apprenticeship-levy/fraction-calculation-date         uk.gov.bis.le
 
 POST        /oauth/token                                           uk.gov.bis.levyApiMock.controllers.security.OAuth2Controller.accessToken
 GET         /oauth/authorize                                       uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorize(scope: String, client_id:String, redirect_uri :String, state:Option[String])
+POST        /oauth/authorize                                       uk.gov.bis.levyApiMock.controllers.security.ClaimAuthController.authorizePost
 GET         /oauth/grantscope                                      uk.gov.bis.levyApiMock.controllers.security.GrantScopeController.show(auth_id: Long)
 
 GET         /test/generate-token                                   uk.gov.bis.levyApiMock.controllers.security.TestController.generateToken(secret: String, ts: Option[Long])
