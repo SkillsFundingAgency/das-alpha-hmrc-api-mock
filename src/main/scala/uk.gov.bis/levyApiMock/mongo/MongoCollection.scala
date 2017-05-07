@@ -15,6 +15,19 @@ trait MongoCollection[T] {
 
   def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection](collectionName))
 
+  def findMany(params: (String, JsValueWrapper)*)(implicit ec: ExecutionContext, reads: Reads[T]): Future[Seq[T]] = {
+    val selector = Json.obj(params: _*)
+    for {
+      collection <- collectionF
+      o <- collection.find(selector).cursor[JsObject]().collect[List](100)
+    } yield o.flatMap {
+      _.validate[T] match {
+        case JsSuccess(resp, _) => Some(resp)
+        case JsError(errs) => None
+      }
+    }
+  }
+
   def findOne(params: (String, JsValueWrapper)*)(implicit ec: ExecutionContext, reads: Reads[T]): Future[Option[T]] = {
     val selector = Json.obj(params: _*)
     val of = for {

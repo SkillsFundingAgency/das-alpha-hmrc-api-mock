@@ -16,6 +16,8 @@ buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 buildInfoPackage := "uk.gov.bis.levyApiMock.buildinfo"
 buildInfoOptions ++= Seq(BuildInfoOption.ToJson, BuildInfoOption.BuildTime)
 
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+
 routesImport ++= Seq(
   "uk.gov.hmrc.domain._",
   "uk.gov.bis.levyApiMock.models.PlayBindings._",
@@ -23,6 +25,21 @@ routesImport ++= Seq(
   "org.joda.time.LocalDate")
 
 scalaVersion := "2.11.8"
+
+scalacOptions ++= Seq(
+  "-language:higherKinds",
+  "-deprecation",
+  "-encoding", "UTF-8",
+  "-feature",
+  "-unchecked",
+  "-Xlint",
+  "-Yinline-warnings",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Ywarn-value-discard",
+  "-Xfuture"
+)
 
 PlayKeys.devSettings := Seq("play.server.http.port" -> "9001")
 
@@ -32,6 +49,8 @@ javaOptions := Seq(
 )
 
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
+
+val enumeratumVersion = "1.5.12"
 
 libraryDependencies ++= Seq(
   ws,
@@ -43,6 +62,8 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo" % "0.11.14",
   "com.github.melrief" %% "pureconfig" % "0.1.6",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
+  "com.beachape" %% "enumeratum" % enumeratumVersion,
+  "com.beachape" %% "enumeratum-play" % "1.5.11",
 
   "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
