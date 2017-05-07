@@ -1,12 +1,11 @@
-package uk.gov.bis.levyApiMock.mongo
+package uk.gov.bis.levyApiMock.services
 
 import cats.Monad
-import org.joda.time.LocalDate
-import org.scalatest.{Matchers, WordSpecLike}
 import uk.gov.bis.levyApiMock.data.levy.EmploymentCheckRecord
-import uk.gov.bis.levyApiMock.services.EmploymentStatusRepo
 
-class EmploymentStatusGenTest extends WordSpecLike with Matchers {
+
+
+object EmploymentStatusGenTestSupport {
 
   case class TestData(records: Seq[EmploymentCheckRecord])
 
@@ -36,13 +35,4 @@ class EmploymentStatusGenTest extends WordSpecLike with Matchers {
       testData => (testData, testData.records.filter(r => r.empref == empref && r.nino == nino))
     }
   }
-
-  val sut = new EmploymentStatusGen[TestF](repo)
-
-  "employed" should {
-    "return no records" in {
-      sut.employed("foo", "bar", new LocalDate(), new LocalDate())(TestData(Seq.empty))._2 shouldBe None
-    }
-  }
-
 }
