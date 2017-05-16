@@ -3,7 +3,7 @@ import uk.gov.bis.levyApiMock.data._
 import uk.gov.bis.levyApiMock.data.levy._
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 import uk.gov.bis.levyApiMock.mongo._
-import uk.gov.bis.levyApiMock.services.{EmploymentStatusImpl, EmploymentStatusRepo}
+import uk.gov.bis.levyApiMock.services.{EmploymentsImpl, EmploymentsRepo}
 
 import scala.concurrent.Future
 
@@ -21,7 +21,7 @@ class Module extends AbstractModule {
     bind(classOf[ClientOps]).to(classOf[ClientMongo])
     bind(classOf[ScopeOps]).to(classOf[ScopeMongo])
 
-    bind(new TypeLiteral[EmploymentStatusOps[Future]] {}).to(classOf[EmploymentStatusImpl])
-    bind(new TypeLiteral[EmploymentStatusRepo[Future]] {}).to(classOf[EmploymentStatusMongo])
+    bind(new TypeLiteral[EmploymentStatusOps[Future]] {}).to(classOf[EmploymentsImpl])
+    bind(new TypeLiteral[EmploymentsRepo[Future]] {}).to(classOf[EmploymentsMongo])
   }
 }

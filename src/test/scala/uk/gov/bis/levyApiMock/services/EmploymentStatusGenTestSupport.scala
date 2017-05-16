@@ -30,7 +30,7 @@ object EmploymentStatusGenTestSupport {
     }
   }
 
-  val repo = new EmploymentStatusRepo[TestF] {
+  val repo = new EmploymentsRepo[TestF] {
     override def find(empref: String, nino: String): TestF[Seq[EmploymentCheckRecord]] = {
       testData => (testData, testData.records.filter(r => r.empref == empref && r.nino == nino))
     }

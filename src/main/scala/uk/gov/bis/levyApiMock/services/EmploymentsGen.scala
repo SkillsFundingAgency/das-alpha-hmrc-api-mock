@@ -11,7 +11,7 @@ import uk.gov.bis.levyApiMock.data.levy.EmploymentStatusOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EmploymentStatusGen[F[_] : Functor] @Inject()(repo: EmploymentStatusRepo[F]) extends EmploymentStatusOps[F] {
+class EmploymentsGen[F[_] : Functor] @Inject()(repo: EmploymentsRepo[F]) extends EmploymentStatusOps[F] {
   override def employed(empref: String, nino: String, dateRange: ClosedDateRange): F[Option[EmploymentCheckResult]] = {
     repo.find(empref, nino).map {
       case Seq() => None
@@ -24,6 +24,5 @@ class EmploymentStatusGen[F[_] : Functor] @Inject()(repo: EmploymentStatusRepo[F
   }
 }
 
-
-class EmploymentStatusImpl @Inject()(repo: EmploymentStatusRepo[Future])(implicit ec: ExecutionContext)
-  extends EmploymentStatusGen[Future](repo)(catsStdInstancesForFuture)
+class EmploymentsImpl @Inject()(repo: EmploymentsRepo[Future])(implicit ec: ExecutionContext)
+  extends EmploymentsGen[Future](repo)(catsStdInstancesForFuture)

@@ -5,11 +5,11 @@ import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import uk.gov.bis.levyApiMock.controllers.ClosedDateRange
 import uk.gov.bis.levyApiMock.data.levy.EmploymentCheckRecord
 
-class EmploymentStatusGenTest extends WordSpecLike with Matchers with OptionValues {
+class EmploymentsGenTest extends WordSpecLike with Matchers with OptionValues {
 
   import EmploymentStatusGenTestSupport._
 
-  val sut = new EmploymentStatusGen[TestF](repo)
+  val sut = new EmploymentsGen[TestF](repo)
 
   "employed" should {
     "return no records" in {
