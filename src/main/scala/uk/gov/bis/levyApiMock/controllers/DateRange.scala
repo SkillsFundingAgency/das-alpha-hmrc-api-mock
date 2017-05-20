@@ -33,7 +33,8 @@ case object OpenDateRange extends DateRange {
 case class ClosedDateRange(from: LocalDate, to: LocalDate) extends DateRange {
   override def contains(date: LocalDate): Boolean = !date.isBefore(from) && !date.isAfter(to)
 
-  def overlaps(otherRange: ClosedDateRange): Boolean = contains(otherRange.from) || contains(otherRange.to)
+  def overlaps(otherRange: ClosedDateRange): Boolean =
+    contains(otherRange.from) || contains(otherRange.to) || otherRange.contains(from) || otherRange.contains(to)
 
   override def toParams: Option[String] = Some(paramString)
 

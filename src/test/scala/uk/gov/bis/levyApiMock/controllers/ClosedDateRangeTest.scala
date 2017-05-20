@@ -13,6 +13,9 @@ class ClosedDateRangeTest extends WordSpecLike with Matchers {
       refRange.overlaps(ClosedDateRange(new LocalDate(2016, 12, 1), new LocalDate(2016, 12, 31))) shouldBe false
       refRange.overlaps(ClosedDateRange(new LocalDate(2016, 12, 1), new LocalDate(2017, 1, 1))) shouldBe true
       refRange.overlaps(ClosedDateRange(new LocalDate(2017, 1, 31), new LocalDate(2017, 2, 10))) shouldBe true
+      refRange.overlaps(ClosedDateRange(new LocalDate(2017, 1, 5), new LocalDate(2017, 1, 10))) shouldBe true
+      refRange.overlaps(ClosedDateRange(new LocalDate(2016, 12, 1), new LocalDate(2017, 2, 20))) shouldBe true
+
       refRange.overlaps(ClosedDateRange(new LocalDate(2017, 2, 1), new LocalDate(2017, 2, 10))) shouldBe false
     }
   }
