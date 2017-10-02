@@ -7,7 +7,7 @@ import uk.gov.bis.utils.SystemTimeSource
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorizedActionBuilderTest extends AsyncWordSpecLike with Matchers with OptionValues {
+class EmprefAuthorizedActionBuilderTest extends AsyncWordSpecLike with Matchers with OptionValues {
 
   private val empref1 = "123/AB12345"
   private val empref2 = "321/XY12345"

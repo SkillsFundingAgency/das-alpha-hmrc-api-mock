@@ -6,7 +6,7 @@ import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import uk.gov.bis.levyApiMock.data.EmploymentStatusOps
-import uk.gov.bis.oauth.actions.AuthorizedAction
+import uk.gov.bis.oauth.actions.EmprefAuthorizedAction
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,7 +18,7 @@ object EmploymentCheckResult {
 }
 
 
-class EmploymentController @Inject()(employment: EmploymentStatusOps[Future], AuthorizedAction: AuthorizedAction)(implicit ec: ExecutionContext) extends Controller {
+class EmploymentController @Inject()(employment: EmploymentStatusOps[Future], AuthorizedAction: EmprefAuthorizedAction)(implicit ec: ExecutionContext) extends Controller {
   def employmentCheck(empref: EmpRef, nino: String, fromDate: LocalDate, toDate: LocalDate) = AuthorizedAction(empref.value).async { implicit request =>
     ClosedDateRange.fromDates(fromDate, toDate) match {
       case Some(dateRange) => employment.employed(empref.value, nino, dateRange).map {

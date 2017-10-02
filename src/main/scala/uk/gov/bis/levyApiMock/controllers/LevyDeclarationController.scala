@@ -6,12 +6,12 @@ import org.joda.time.LocalDate
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.data.{LevyDeclarationOps, LevyDeclarationResponse}
-import uk.gov.bis.oauth.actions.AuthorizedAction
+import uk.gov.bis.oauth.actions.EmprefAuthorizedAction
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext
 
-class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: AuthorizedAction)(implicit exec: ExecutionContext)
+class LevyDeclarationController @Inject()(declarations: LevyDeclarationOps, AuthorizedAction: EmprefAuthorizedAction)(implicit exec: ExecutionContext)
   extends Controller {
 
   implicit class LevyDeclarationsSyntax(resp: LevyDeclarationResponse) {

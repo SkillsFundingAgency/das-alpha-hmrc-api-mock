@@ -2,15 +2,26 @@ package uk.gov.bis.userinfoApiMock.controllers
 
 import javax.inject.Inject
 
-import play.api.mvc.{Action, Controller}
-import uk.gov.bis.oauth.actions.AuthorizedAction
+import play.api.libs.json.Json
+import play.api.mvc.Controller
+import uk.gov.bis.oauth.actions.AuthenticatedAction
+import uk.gov.bis.userinfoApiMock.data.UserInfoService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class UserInfoController @Inject()(AuthorizedAction: AuthorizedAction)(implicit ec: ExecutionContext) extends Controller {
+class UserInfoController @Inject()(userInfo: UserInfoService, authenticatedAction: AuthenticatedAction)(implicit ec: ExecutionContext) extends Controller {
   //noinspection TypeAnnotation
-  def userinfo = Action.async { implicit request =>
-    ???
+  def userinfo = authenticatedAction.async { implicit request =>
+    val scopes = request.authRecord.scope.getOrElse("").split(" ").toList.filter(_.trim != "")
+
+    if (!scopes.contains("openid")) {
+      Future.successful(Unauthorized("No 'openid' scope is associated with bearer token"))
+    } else {
+      userInfo.forGatewayID(request.authRecord.gatewayID, scopes).map {
+        case None     => NotFound
+        case Some(ui) => Ok(Json.toJson(ui))
+      }
+    }
   }
 }
 

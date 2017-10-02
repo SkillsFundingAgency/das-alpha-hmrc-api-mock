@@ -5,12 +5,12 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import uk.gov.bis.levyApiMock.data._
-import uk.gov.bis.oauth.actions.AuthorizedAction
+import uk.gov.bis.oauth.actions.EmprefAuthorizedAction
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext
 
-class EmprefController @Inject()(emprefs: EmprefOps, AuthorizedAction: AuthorizedAction)(implicit ec: ExecutionContext) extends Controller {
+class EmprefController @Inject()(emprefs: EmprefOps, AuthorizedAction: EmprefAuthorizedAction)(implicit ec: ExecutionContext) extends Controller {
 
   implicit val empNameW = Json.writes[EmployerName]
   implicit val empW = Json.writes[Employer]

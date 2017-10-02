@@ -23,7 +23,7 @@ import enumeratum._
   */
 sealed trait EnrolmentState extends EnumEntry with CapitalWords with Camelcase
 
-object EnrolmentState extends Enum[EnrolmentState] with PlayEnum[EnrolmentState] {
+object EnrolmentState extends Enum[EnrolmentState] {
   //noinspection TypeAnnotation
   val values = findValues
 
@@ -54,13 +54,13 @@ case class Address(
 )
 
 case class UserInfo(
-  given_name: Option[String],
-  family_name: Option[String],
-  middle_name: Option[String],
-  email: Option[String],
-  birthdate: Option[String],
-  uk_gov_nino: Option[String],
-  address: Option[Address],
-  hmrc_enrolments: Option[Seq[Enrolment]],
-  government_gateway: Option[GovernmentGateway]
+  given_name: Option[String] = None,
+  family_name: Option[String] = None,
+  middle_name: Option[String] = None,
+  email: Option[String] = None,
+  birthdate: Option[String] = None,
+  uk_gov_nino: Option[String] = None,
+  address: Option[Address] = None,
+  hmrc_enrolments: Option[Seq[Enrolment]] = None,
+  government_gateway: Option[GovernmentGateway] = None
 )

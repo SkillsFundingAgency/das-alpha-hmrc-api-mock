@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * an AuthorizedAction must both have a valid access token and that token must allow access to the given empref
   */
-class AuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserOps, timeSource: TimeSource)(implicit executionContext: ExecutionContext) {
+class EmprefAuthorizedAction @Inject()(authRecords: AuthRecordOps, users: GatewayUserOps, timeSource: TimeSource)(implicit executionContext: ExecutionContext) {
   def apply(empref: String): AuthAction = new AuthorizedActionBuilder(empref, authRecords, users, timeSource)
 }
 

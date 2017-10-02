@@ -6,7 +6,7 @@ import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.bis.levyApiMock.data._
-import uk.gov.bis.oauth.actions.AuthorizedAction
+import uk.gov.bis.oauth.actions.EmprefAuthorizedAction
 import uk.gov.hmrc.domain.EmpRef
 
 import scala.concurrent.ExecutionContext
@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 class FractionsController @Inject()(
                                      fractionOps: FractionsOps,
                                      fractionCalcOps: FractionCalcOps,
-                                     AuthorizedAction: AuthorizedAction
+                                     AuthorizedAction: EmprefAuthorizedAction
                                    )(implicit exec: ExecutionContext) extends Controller {
 
   implicit class FractionResponseSyntax(resp: FractionResponse) {
