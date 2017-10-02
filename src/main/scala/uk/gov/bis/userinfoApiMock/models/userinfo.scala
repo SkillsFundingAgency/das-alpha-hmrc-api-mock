@@ -1,6 +1,6 @@
 package uk.gov.bis.userinfoApiMock.models
 
-import enumeratum.EnumEntry.{Camelcase, CapitalWords}
+import enumeratum.EnumEntry.{Camelcase, CapitalWords, Lowercase}
 import enumeratum._
 
 /*
@@ -21,7 +21,7 @@ import enumeratum._
   *
   * so I have provided for both capitalised and camel case entries.
   */
-sealed trait EnrolmentState extends EnumEntry with CapitalWords with Camelcase
+sealed trait EnrolmentState extends EnumEntry with CapitalWords with Camelcase with Lowercase
 
 object EnrolmentState extends Enum[EnrolmentState] {
   //noinspection TypeAnnotation
@@ -34,7 +34,9 @@ object EnrolmentState extends Enum[EnrolmentState] {
   case object GivenToAgent extends EnrolmentState
 }
 
-case class Enrolment(key: String, identifiers: Map[String, String], state: EnrolmentState)
+case class Identifier(key: String, value: String)
+
+case class Enrolment(gatewayID: String, key: String, identifiers: Seq[Identifier], state: EnrolmentState)
 
 case class GovernmentGateway(
   user_id: Option[String],
