@@ -1,6 +1,7 @@
 package uk.gov.bis.levyApiMock.data.stubs
 
-import uk.gov.bis.levyApiMock.data.{Application, ClientOps, TimeSource}
+import uk.gov.bis.oauth.data.{Application, ClientOps}
+import uk.gov.bis.utils.TimeSource
 
 import scala.concurrent.{ExecutionContext, Future}
 

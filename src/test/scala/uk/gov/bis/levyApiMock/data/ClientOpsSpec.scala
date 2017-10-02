@@ -2,7 +2,9 @@ package uk.gov.bis.levyApiMock.data
 
 import org.apache.commons.codec.binary.Base32
 import org.scalatest.{AsyncWordSpecLike, Matchers, OptionValues}
-import uk.gov.bis.levyApiMock.auth.TOTP
+import uk.gov.bis.oauth.auth.TOTP
+import uk.gov.bis.oauth.data.{Application, ClientOps}
+import uk.gov.bis.utils.TimeSource
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}

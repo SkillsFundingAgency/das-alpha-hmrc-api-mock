@@ -1,9 +1,9 @@
 import com.google.inject.{AbstractModule, TypeLiteral}
 import uk.gov.bis.levyApiMock.data._
-import uk.gov.bis.levyApiMock.data.levy._
-import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
 import uk.gov.bis.levyApiMock.mongo._
 import uk.gov.bis.levyApiMock.services.{EmploymentsImpl, EmploymentsRepo}
+import uk.gov.bis.oauth.data._
+import uk.gov.bis.oauth.mongo._
 
 import scala.concurrent.Future
 

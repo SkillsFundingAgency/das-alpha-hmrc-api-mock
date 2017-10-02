@@ -5,9 +5,10 @@ import play.api.libs.json.{JsString, JsValue}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.bis.levyApiMock.auth.APIDataHandler
-import uk.gov.bis.levyApiMock.data.SystemTimeSource
-import uk.gov.bis.levyApiMock.data.oauth2.AuthRecordOps
+import uk.gov.bis.oauth.auth.APIDataHandler
+import uk.gov.bis.oauth.controllers.OAuth2Controller
+import uk.gov.bis.oauth.data.AuthRecordOps
+import uk.gov.bis.utils.SystemTimeSource
 
 import scala.concurrent.Future
 

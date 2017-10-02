@@ -1,6 +1,6 @@
 package uk.gov.bis.levyApiMock.data.stubs
 
-import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow}
+import uk.gov.bis.oauth.data.{AuthCodeOps, AuthCodeRow}
 
 import scala.concurrent.{ExecutionContext, Future}
 

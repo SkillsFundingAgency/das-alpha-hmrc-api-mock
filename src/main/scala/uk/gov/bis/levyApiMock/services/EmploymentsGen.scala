@@ -5,9 +5,8 @@ import javax.inject.Inject
 import cats.Functor
 import cats.instances.future._
 import cats.syntax.functor._
-import uk.gov.bis.levyApiMock.controllers.{ClosedDateRange, DateRange}
-import uk.gov.bis.levyApiMock.controllers.api.EmploymentCheckResult
-import uk.gov.bis.levyApiMock.data.levy.EmploymentStatusOps
+import uk.gov.bis.levyApiMock.controllers.{ClosedDateRange, EmploymentCheckResult}
+import uk.gov.bis.levyApiMock.data.EmploymentStatusOps
 
 import scala.concurrent.{ExecutionContext, Future}
 

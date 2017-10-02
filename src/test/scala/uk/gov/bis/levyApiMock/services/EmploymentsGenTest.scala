@@ -3,7 +3,7 @@ package uk.gov.bis.levyApiMock.services
 import org.joda.time.LocalDate
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import uk.gov.bis.levyApiMock.controllers.ClosedDateRange
-import uk.gov.bis.levyApiMock.data.levy.EmploymentCheckRecord
+import uk.gov.bis.levyApiMock.data.EmploymentCheckRecord
 
 class EmploymentsGenTest extends WordSpecLike with Matchers with OptionValues {
 

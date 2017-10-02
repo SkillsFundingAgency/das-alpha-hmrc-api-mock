@@ -1,8 +1,9 @@
 package uk.gov.bis.levyApiMock.controllers.api
 
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
-import uk.gov.bis.levyApiMock.actions.AuthenticatedAction
-import uk.gov.bis.levyApiMock.data.levy.Href
+import uk.gov.bis.levyApiMock.controllers.RootController
+import uk.gov.bis.oauth.actions.AuthenticatedAction
+import uk.gov.bis.levyApiMock.data.Href
 import uk.gov.bis.levyApiMock.data.stubs.{StubAuthRecordOps, StubGatewayUserOps}
 import views.html.helper.urlEncode
 

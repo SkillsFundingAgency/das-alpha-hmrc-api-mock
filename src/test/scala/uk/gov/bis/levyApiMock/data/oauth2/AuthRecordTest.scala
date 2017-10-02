@@ -1,6 +1,7 @@
 package uk.gov.bis.levyApiMock.data.oauth2
 
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import uk.gov.bis.oauth.data.AuthRecord
 
 class AuthRecordTest extends WordSpecLike with Matchers with OptionValues {
   val now = 300000L

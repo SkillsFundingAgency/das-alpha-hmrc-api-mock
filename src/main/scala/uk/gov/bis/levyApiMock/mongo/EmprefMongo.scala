@@ -4,7 +4,8 @@ import javax.inject._
 
 import play.api.libs.json._
 import play.modules.reactivemongo._
-import uk.gov.bis.levyApiMock.data.levy._
+import uk.gov.bis.levyApiMock.data._
+import uk.gov.bis.mongo.MongoCollection
 
 import scala.concurrent.ExecutionContext
 

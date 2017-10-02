@@ -1,8 +1,7 @@
 package uk.gov.bis.levyApiMock.services
 
 import cats.Monad
-import uk.gov.bis.levyApiMock.data.levy.EmploymentCheckRecord
-
+import uk.gov.bis.levyApiMock.data.EmploymentCheckRecord
 
 
 object EmploymentStatusGenTestSupport {

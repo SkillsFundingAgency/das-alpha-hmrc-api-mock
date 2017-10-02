@@ -1,6 +1,6 @@
 package uk.gov.bis.levyApiMock.data.stubs
 
-import uk.gov.bis.levyApiMock.data.{GatewayUser, GatewayUserOps}
+import uk.gov.bis.oauth.data.{GatewayUser, GatewayUserOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
