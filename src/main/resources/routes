@@ -15,6 +15,8 @@ GET         /apprenticeship-levy/epaye/*empref                       uk.gov.bis.
 
 GET         /apprenticeship-levy/fraction-calculation-date           uk.gov.bis.levyApiMock.controllers.FractionsController.calculationDate()
 
+# A bug in WS02 means that on the live service the userinfo endpoint must be called with a trailing slash
+GET         /userinfo/                                               uk.gov.bis.userinfoApiMock.controllers.UserInfoController.userinfo()
 GET         /userinfo                                                uk.gov.bis.userinfoApiMock.controllers.UserInfoController.userinfo()
 
 POST        /oauth/token                                             uk.gov.bis.oauth.controllers.OAuth2Controller.accessToken

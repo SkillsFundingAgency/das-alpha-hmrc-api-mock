@@ -36,16 +36,18 @@ object EnrolmentState extends Enum[EnrolmentState] {
 
 case class Identifier(key: String, value: String)
 
-case class Enrolment(gatewayID: String, key: String, identifiers: Seq[Identifier], state: EnrolmentState)
+case class Enrolments(gatewayID: String, enrolments: Seq[Enrolment])
+
+case class Enrolment(key: String, identifiers: Seq[Identifier], state: EnrolmentState)
 
 case class GovernmentGateway(
-  user_id: Option[String],
-  roles: Option[Seq[String]],
-  affinity_group: String,
-  agent_code: Option[String],
-  agent_friendly_name: Option[String],
-  agent_id: Option[String],
-  gateway_token: Option[String]
+  user_id: Option[String] = None,
+  roles: Option[Seq[String]]= None,
+  affinity_group: String= "Organisation",
+  agent_code: Option[String]= None,
+  agent_friendly_name: Option[String]= None,
+  agent_id: Option[String]= None,
+  gateway_token: Option[String]= None
 )
 
 case class Address(

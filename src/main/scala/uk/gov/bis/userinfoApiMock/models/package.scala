@@ -9,5 +9,6 @@ package object models {
   implicit val enrolmentStateFormat: Format[EnrolmentState]     = EnumFormats.formats(EnrolmentState)
   implicit val identifierFormat    : OFormat[Identifier]        = Json.format
   implicit val enrolmentFormat     : OFormat[Enrolment]         = Json.format
+  implicit val enrolmentsFormat    : OFormat[Enrolments]        = Json.format
   implicit val userinfoFormat      : OFormat[UserInfo]          = Json.format
 }
