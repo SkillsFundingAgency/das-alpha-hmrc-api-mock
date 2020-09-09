@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json._
+import reactivemongo.play.json.compat._
 import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow, TimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,7 +19,7 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi, timeSource: TimeSou
   override def delete(code: String)(implicit ec: ExecutionContext): Future[Int] = {
     for {
       coll <- collectionF
-      i <- coll.remove(Json.obj("authorizationCode" -> code))
+      i <- coll.delete().one(Json.obj("authorizationCode" -> code))
     } yield i.n
   }
 
@@ -27,7 +27,7 @@ class AuthCodeMongo @Inject()(val mongodb: ReactiveMongoApi, timeSource: TimeSou
     val row = AuthCodeRow(code, gatewayUserId, redirectUri, timeSource.currentTimeMillis(), Some("read:apprenticeship-levy"), Some(clientId), 3600)
     for {
       coll <- collectionF
-      i <- coll.insert(row)
+      i <- coll.insert(ordered = false).one(row)
     } yield i.n
   }
 }

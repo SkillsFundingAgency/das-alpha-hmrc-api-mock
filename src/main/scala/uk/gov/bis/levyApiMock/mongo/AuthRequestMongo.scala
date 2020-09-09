@@ -18,7 +18,7 @@ class AuthRequestMongo @Inject()(val mongodb: ReactiveMongoApi) extends MongoCol
     val id = Random.nextLong().abs
     for {
       collection <- collectionF
-      r <- collection.insert(authRequest.copy(id = id))
+      r <- collection.insert(ordered = false).one(authRequest.copy(id = id))
     } yield id
   }
 
