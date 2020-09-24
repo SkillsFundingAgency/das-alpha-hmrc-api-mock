@@ -2,10 +2,11 @@ package uk.gov.bis.levyApiMock.mongo
 
 import javax.inject.Inject
 
-import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json.compat._
 import uk.gov.bis.levyApiMock.data.{AuthCodeOps, AuthCodeRow, TimeSource}
+import play.api.libs.json._
+import reactivemongo.play.json.compat._
+import json2bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 

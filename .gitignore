@@ -7,3 +7,8 @@ target
 /.settings
 /RUNNING_PID
 testdb/
+conf/cbkeystore.keystore
+.metals/metals.h2.db
+.metals/metals.log
+.history
+.metals/metals.lock.db

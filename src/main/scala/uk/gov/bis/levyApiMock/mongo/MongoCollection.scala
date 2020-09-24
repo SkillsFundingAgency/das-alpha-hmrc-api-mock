@@ -3,24 +3,26 @@ package uk.gov.bis.levyApiMock.mongo
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.play.json.compat._
 import reactivemongo.api.Cursor
-import reactivemongo.play.json.collection.JSONCollection
+import reactivemongo.play.json.compat._
+import json2bson._
+
 
 import scala.concurrent.{ExecutionContext, Future}
+import reactivemongo.api.bson.collection.BSONCollection
 
 trait MongoCollection[T] {
   def mongodb: ReactiveMongoApi
 
   def collectionName: String
 
-  def collectionF(implicit ec: ExecutionContext): Future[JSONCollection] = mongodb.database.map(_.collection[JSONCollection](collectionName))
+  def collectionF(implicit ec: ExecutionContext): Future[BSONCollection] = mongodb.database.map(_.collection[BSONCollection](collectionName))
 
   def findMany(params: (String, JsValueWrapper)*)(implicit ec: ExecutionContext, reads: Reads[T]): Future[Seq[T]] = {
     val selector = Json.obj(params: _*)
     for {
       collection <- collectionF
-      o <- collection.find(selector).cursor[JsObject]().collect[List](100, Cursor.FailOnError[List[JsObject]]())
+      o <- collection.find(selector,projection=Option.empty[JsObject]).cursor[JsObject]().collect[List](100, Cursor.FailOnError[List[JsObject]]())
     } yield o.flatMap {
       _.validate[T] match {
         case JsSuccess(resp, _) => Some(resp)
@@ -33,7 +35,7 @@ trait MongoCollection[T] {
     val selector = Json.obj(params: _*)
     val of = for {
       collection <- collectionF
-      o <- collection.find(selector).cursor[JsObject]().collect[List](1, Cursor.FailOnError[List[JsObject]]()).map(_.headOption)
+      o <- collection.find(selector,projection=Option.empty[JsObject]).cursor[JsObject]().collect[List](1, Cursor.FailOnError[List[JsObject]]()).map(_.headOption)
     } yield o
 
     of.map {
