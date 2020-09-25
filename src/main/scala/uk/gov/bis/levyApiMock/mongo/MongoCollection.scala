@@ -35,13 +35,13 @@ trait MongoCollection[T] {
     val selector = Json.obj(params: _*)
     val of = for {
       collection <- collectionF
-      o <- collection.find(selector,projection=Option.empty[JsObject]).cursor[JsObject]().collect[List](1, Cursor.FailOnError[List[JsObject]]()).map(_.headOption)
+      o <- collection.find(selector).cursor[JsObject]().collect[List](1, Cursor.FailOnError[List[JsObject]]()).map(_.headOption)
     } yield o
 
     of.map {
       case Some(o) => o.validate[T] match {
-        case JsSuccess(resp, _) => Some(resp)
-        case JsError(errs) => None
+        case JsSuccess(resp, _) => Some(resp) 
+        case JsError(errs) => None 
       }
       case _ => None
     }

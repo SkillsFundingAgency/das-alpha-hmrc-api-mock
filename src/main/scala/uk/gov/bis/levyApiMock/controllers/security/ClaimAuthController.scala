@@ -8,6 +8,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Action, Controller}
 import uk.gov.bis.levyApiMock.data._
+import org.joda.time.{DateTime}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,7 +32,7 @@ class ClaimAuthController @Inject()(scopes: ScopeOps, authIds: AuthRequestOps, c
     val authIdOrError = for {
       _ <- EitherT(clients.forId(clientId).map(_.orError("unknown client id")))
       _ <- EitherT(scopes.byName(scopeName).map(_.orError("unknown scope")))
-    } yield AuthRequest(scopeName, clientId, redirectUri, state, 0, MongoDate.fromLong(timeSource.currentTimeMillis()))
+    } yield AuthRequest(scopeName, clientId, redirectUri, state, 0, new DateTime())
 
 
     authIdOrError.value.flatMap {

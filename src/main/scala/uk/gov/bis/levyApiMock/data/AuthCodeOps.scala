@@ -1,8 +1,9 @@
 package uk.gov.bis.levyApiMock.data
 
+import org.joda.time.{DateTime}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthCodeRow(authorizationCode: String, gatewayId: String, redirectUri: String, createdAt: MongoDate, scope: Option[String], clientId: Option[String], expiresIn: Int)
+case class AuthCodeRow(authorizationCode: String, gatewayId: String, redirectUri: String, createdAt: DateTime, scope: Option[String], clientId: Option[String], expiresIn: Int)
 
 trait AuthCodeOps {
   def find(code: String)(implicit ec: ExecutionContext): Future[Option[AuthCodeRow]]

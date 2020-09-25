@@ -40,14 +40,14 @@ class APIDataHandler @Inject()(
   override def getStoredAccessToken(authInfo: AuthInfo[GatewayUser]): Future[Option[AccessToken]] = {
     OAuthTrace("get stored access token using AuthInfo")
     OptionT(authRecords.find(authInfo.user.gatewayID, authInfo.clientId)).map { token =>
-      AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), new Date(token.createdAt))
+      AccessToken(token.accessToken, token.refreshToken, token.scope, Some(token.expiresIn), token.createdAt.toDate())
     }
   }.value
 
   override def findAccessToken(token: String): Future[Option[AccessToken]] = {
     OAuthTrace("find access token by String")
     OptionT(authRecords.forAccessToken(token)).map { auth =>
-      AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.createdAt))
+      AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), auth.createdAt.toDate())
     }
   }.value
 

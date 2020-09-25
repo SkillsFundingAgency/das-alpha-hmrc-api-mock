@@ -1,23 +1,23 @@
 package uk.gov.bis.levyApiMock.data.oauth2
 
-import uk.gov.bis.levyApiMock.data.MongoDate
+import org.joda.time.{DateTime}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthRecord(
                        accessToken: String,
                        refreshToken: Option[String],
-                       refreshedAt: Option[MongoDate],
+                       refreshedAt: Option[DateTime],
                        gatewayID: String,
                        scope: Option[String],
                        expiresIn: Long,
-                       createdAt: MongoDate,
+                       createdAt: DateTime,
                        clientID: String,
                        privileged: Option[Boolean]) {
   val eighteenMonths: Long = 18 * 30 * 24 * 60 * 60 * 1000L
 
-  val accessTokenExpiresAt: Long = refreshedAt.getOrElse(createdAt).longValue + expiresIn * 1000L
-  val refreshTokenExpiresAt: Long = createdAt.longValue + eighteenMonths
+  val accessTokenExpiresAt: Long = refreshedAt.getOrElse(createdAt).getMillis() + expiresIn * 1000L
+  val refreshTokenExpiresAt: Long = createdAt.getMillis() + eighteenMonths
   val isPrivileged: Boolean = privileged.getOrElse(false)
 
   def accessTokenExpired(referenceTimeInMills: Long): Boolean = accessTokenExpiresAt <= referenceTimeInMills
