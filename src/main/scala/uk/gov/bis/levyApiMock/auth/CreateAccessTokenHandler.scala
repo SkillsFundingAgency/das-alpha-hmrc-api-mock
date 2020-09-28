@@ -7,6 +7,7 @@ import uk.gov.bis.levyApiMock.data.{ClientOps, GatewayUser, TimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider.{AccessToken, AuthInfo}
+import org.joda.time.{DateTime}
 
 trait CreateAccessTokenHandler {
   def timeSource: TimeSource
@@ -35,9 +36,9 @@ trait CreateAccessTokenHandler {
   private val accessTokenExpiresInFourHours: Long = 4L * 60L * 60L
 
   private def buildAuthRecord(authInfo: AuthInfo[GatewayUser], privileged: Boolean): AuthRecord =
-    AuthRecord(generateToken, Some(generateToken), None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresInFourHours, timeSource.currentTimeMillis(), authInfo.clientId.get, Some(privileged))
+    AuthRecord(generateToken, Some(generateToken), None, authInfo.user.gatewayID, authInfo.scope, accessTokenExpiresInFourHours, new DateTime(), authInfo.clientId.get, Some(privileged))
 
   private def buildAccessToken(auth: AuthRecord) = {
-    AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), new Date(auth.refreshedAt.map(_.longValue).getOrElse(timeSource.currentTimeMillis())))
+    AccessToken(auth.accessToken, auth.refreshToken, auth.scope, Some(auth.expiresIn), auth.refreshedAt.map(_.toDate()).getOrElse(new DateTime().toDate()))
   }
 }

@@ -2,6 +2,7 @@ package uk.gov.bis.levyApiMock.data
 
 import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
 import uk.gov.bis.levyApiMock.data.stubs.{StubAuthCodeOps, StubAuthRecordOps, StubClientOps, StubGatewayUserOps}
+import org.joda.time.{DateTime}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +38,7 @@ object CommonTestData {
 
   class DummyAuthRecords extends StubAuthRecordOps {
     val records = Seq(
-      AuthRecord(acesstoken1, Some(refreshtoken1), Some(MongoDate.fromLong(System.currentTimeMillis())), user1, None, 3600, MongoDate.fromLong(System.currentTimeMillis()), nonPriviligedClientId, Some(false))
+      AuthRecord(acesstoken1, Some(refreshtoken1), Some(new DateTime()), user1, None, 3600, new DateTime(), nonPriviligedClientId, Some(false))
     )
 
     override def forRefreshToken(refreshToken: String)(implicit ec: ExecutionContext): Future[Option[AuthRecord]] = {

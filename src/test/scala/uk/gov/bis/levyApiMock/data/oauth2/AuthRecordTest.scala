@@ -1,27 +1,28 @@
 package uk.gov.bis.levyApiMock.data.oauth2
 
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.joda.time.{DateTime}
 
 class AuthRecordTest extends WordSpecLike with Matchers with OptionValues {
-  val now = 300000L
+  val now = new DateTime()
   val arWithoutRefreshedAt = AuthRecord("at", Some("rt"), None, "", None, 3600, now, "", None)
   val arWithRefreshedAt = arWithoutRefreshedAt.copy(refreshedAt = Some(now))
 
   "AuthRecord" should {
     "say the refresh token is expired when there is no refreshedAt time" in {
-      arWithoutRefreshedAt.refreshTokenExpired(now + arWithoutRefreshedAt.eighteenMonths + 1) shouldBe true
+      arWithoutRefreshedAt.refreshTokenExpired(now.getMillis() + arWithoutRefreshedAt.eighteenMonths + 1) shouldBe true
     }
 
     "say the refresh token is expired when there is a refreshedAt time" in {
-      arWithRefreshedAt.refreshTokenExpired(now + arWithoutRefreshedAt.eighteenMonths + 1) shouldBe true
+      arWithRefreshedAt.refreshTokenExpired(now.getMillis() + arWithoutRefreshedAt.eighteenMonths + 1) shouldBe true
     }
 
     "say the refresh token is not expired when there is no refreshedAt time" in {
-      arWithoutRefreshedAt.refreshTokenExpired(now) shouldBe false
+      arWithoutRefreshedAt.refreshTokenExpired(now.getMillis()) shouldBe false
     }
 
     "say the refresh token is not expired when there is a refreshedAt time" in {
-      arWithRefreshedAt.refreshTokenExpired(now) shouldBe false
+      arWithRefreshedAt.refreshTokenExpired(now.getMillis()) shouldBe false
     }
   }
 

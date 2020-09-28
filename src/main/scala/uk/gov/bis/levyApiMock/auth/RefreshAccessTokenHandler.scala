@@ -8,6 +8,7 @@ import uk.gov.bis.levyApiMock.data.{GatewayUser, TimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaoauth2.provider.{AccessToken, AuthInfo}
+import org.joda.time.{DateTime}
 
 trait RefreshAccessTokenHandler {
   def timeSource: TimeSource
@@ -21,12 +22,12 @@ trait RefreshAccessTokenHandler {
 
     authRecords.forRefreshToken(refreshToken).flatMap {
       case Some(authRecord) if !authRecord.refreshTokenExpired(timeSource.currentTimeMillis()) =>
-        val refreshedAt = timeSource.currentTimeMillis()
+        val refreshedAt = new DateTime()
         val expireInOneHour = Some(60L * 60L)
         val updatedRow = authRecord.copy(accessToken = generateToken, refreshToken = Some(generateToken), refreshedAt = Some(refreshedAt))
         for {
           _ <- authRecords.deleteExistingAndCreate(authRecord, updatedRow)
-        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, new Date(refreshedAt))
+        } yield AccessToken(updatedRow.accessToken, updatedRow.refreshToken, authInfo.scope, expireInOneHour, refreshedAt.toDate())
 
       case Some(authRecord) =>
         val s = s"Refresh token has expired"

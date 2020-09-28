@@ -1,5 +1,5 @@
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.9")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.19")
 
 // web plugins
 
@@ -13,3 +13,6 @@ addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.3.7")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
 
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.1")
+
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.21")

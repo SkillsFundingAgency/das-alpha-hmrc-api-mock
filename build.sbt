@@ -16,7 +16,7 @@ buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 buildInfoPackage := "uk.gov.bis.levyApiMock.buildinfo"
 buildInfoOptions ++= Seq(BuildInfoOption.ToJson, BuildInfoOption.BuildTime)
 
-addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.10")
 
 routesImport ++= Seq(
   "uk.gov.hmrc.domain._",
@@ -24,7 +24,7 @@ routesImport ++= Seq(
   "uk.gov.bis.levyApiMock.models.QueryBinders._",
   "org.joda.time.LocalDate")
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.12"
 
 scalacOptions ++= Seq(
   "-language:higherKinds",
@@ -50,20 +50,25 @@ javaOptions := Seq(
 
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
+scalafixDependencies in ThisBuild ++= Seq(
+  "org.reactivemongo" %% "reactivemongo-scalafix" % "1.0.0")
+
 val enumeratumVersion = "1.5.12"
 
 libraryDependencies ++= Seq(
   ws,
   "com.nulab-inc" %% "play2-oauth2-provider" % "1.0.0",
-  "uk.gov.hmrc" %% "domain" % "3.5.0",
-  "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.typelevel" %% "cats-core" % "0.8.1",
+  "uk.gov.hmrc" %% "domain" % "5.3.0",
+  "org.mindrot" % "jbcrypt" % "0.4",
+  "org.typelevel" %% "cats-core" % "0.9.0",
   "com.github.nscala-time" %% "nscala-time" % "2.12.0",
-  "org.reactivemongo" %% "reactivemongo" % "0.11.14",
-  "com.github.melrief" %% "pureconfig" % "0.1.6",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.14",
+  "com.github.melrief" %% "pureconfig" % "0.1.9",
+  "org.reactivemongo" %% "reactivemongo-play-json-compat" % "1.0.0-play25-rc.3",
+  "org.reactivemongo" %% "reactivemongo" % "1.0.0",
+  "org.reactivemongo" %% "play2-reactivemongo" % "1.0.0-play25-rc.3",
+  "org.reactivemongo" %% "reactivemongo-bson-api" % "1.0.0",
   "com.beachape" %% "enumeratum" % enumeratumVersion,
   "com.beachape" %% "enumeratum-play" % "1.5.11",
 
-  "org.scalatest" %% "scalatest" % "3.0.1" % Test
+  "org.scalatest" %% "scalatest" % "3.0.9" % Test
 )

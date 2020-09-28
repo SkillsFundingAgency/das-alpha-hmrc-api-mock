@@ -5,6 +5,7 @@ import uk.gov.bis.levyApiMock.data.oauth2.AuthRecord
 import uk.gov.bis.levyApiMock.data.{GatewayUser, SystemTimeSource}
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.joda.time.{DateTime}
 
 class AuthorizedActionBuilderTest extends AsyncWordSpecLike with Matchers with OptionValues {
 
@@ -15,9 +16,9 @@ class AuthorizedActionBuilderTest extends AsyncWordSpecLike with Matchers with O
   private val testUser = GatewayUser(testUsername, "", Some(empref1), None, None)
 
   private val nonPrivilegedToken = "12334567890"
-  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(false))
+  private val nonPrivilegedAuthRecord = AuthRecord(nonPrivilegedToken, None, None, testUsername, None, 3600, new DateTime(), "", Some(false))
   private val privilegedToken = "0987654321"
-  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, None, testUsername, None, 3600, System.currentTimeMillis(), "", Some(true))
+  private val privilegedAuthRecord = AuthRecord(privilegedToken, None, None, testUsername, None, 3600, new DateTime(), "", Some(true))
 
   val records = Map(
     nonPrivilegedToken -> nonPrivilegedAuthRecord,
